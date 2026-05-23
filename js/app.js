@@ -1,5 +1,5 @@
 // ============================================================
-// FAZ 1 — Ana uygulama: giriş + ekran yönetimi
+// FAZ 2 — Ana uygulama + alt menü navigasyonu
 // ============================================================
 import { onAuthChange, login, logout, emailToUsername } from "./auth.js";
 
@@ -18,12 +18,10 @@ function showScreen(name) {
 // ----- OTURUM DURUMU -----
 onAuthChange(user => {
   if (user) {
-    // Giriş yapılmış
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
   } else {
-    // Giriş yok
     showScreen('login');
   }
 });
@@ -41,12 +39,10 @@ function showError(msg) {
   loginError.textContent = msg;
   loginError.hidden = false;
 }
-
 function clearError() {
   loginError.hidden = true;
   loginError.textContent = '';
 }
-
 function setLoading(loading) {
   loginButton.disabled = loading;
   buttonText.hidden = loading;
@@ -56,21 +52,16 @@ function setLoading(loading) {
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearError();
-
   const username = usernameInput.value.trim();
   const password = passwordInput.value;
-
   if (!username || !password) {
     showError('Kullanıcı adı ve şifre gerekli');
     return;
   }
-
   setLoading(true);
-
   try {
     await login(username, password);
     passwordInput.value = '';
-    // Başarılı — onAuthChange home'a yönlendirecek
   } catch (error) {
     setLoading(false);
     showError(translateAuthError(error.code));
@@ -78,16 +69,15 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ----- ŞİFRE GÖSTER/GİZLE -----
+// Şifre göster/gizle
 const togglePassword = document.getElementById('toggle-password');
 togglePassword.addEventListener('click', () => {
   const isPwd = passwordInput.type === 'password';
   passwordInput.type = isPwd ? 'text' : 'password';
   togglePassword.classList.toggle('visible', isPwd);
-  togglePassword.setAttribute('aria-label', isPwd ? 'Şifreyi gizle' : 'Şifreyi göster');
 });
 
-// ----- ÇIKIŞ -----
+// Çıkış
 const logoutButton = document.getElementById('logout-button');
 logoutButton.addEventListener('click', async () => {
   if (!confirm('Çıkış yapmak istediğine emin misin?')) return;
@@ -96,12 +86,13 @@ logoutButton.addEventListener('click', async () => {
     loginForm.reset();
     clearError();
     setLoading(false);
+    // Sekmeyi ana sayfaya sıfırla ki bir sonraki girişte düzgün açılsın
+    switchTab('home');
   } catch (error) {
     console.error('Çıkış hatası:', error);
   }
 });
 
-// ----- HATA MESAJI ÇEVİRMENİ -----
 function translateAuthError(code) {
   const errors = {
     'auth/invalid-credential': 'Kullanıcı adı veya şifre hatalı',
@@ -115,3 +106,21 @@ function translateAuthError(code) {
   };
   return errors[code] || 'Giriş başarısız, tekrar dene';
 }
+
+// ============================================================
+// ALT MENÜ NAVİGASYONU
+// ============================================================
+const navItems = document.querySelectorAll('.nav-item');
+const tabContents = document.querySelectorAll('.tab-content');
+
+function switchTab(tabName) {
+  navItems.forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+  tabContents.forEach(c => c.classList.toggle('active', c.id === `tab-${tabName}`));
+}
+
+navItems.forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// ============================================================
+// ARAÇLAR ALT SEKMELERI (Aktif / Satıla
