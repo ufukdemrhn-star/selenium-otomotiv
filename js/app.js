@@ -1,52 +1,117 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
-
 // ============================================================
-// FAZ 0 — Firebase bağlantı testi
+// FAZ 1 — Ana uygulama: giriş + ekran yönetimi
 // ============================================================
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js";
 
-// Firebase'i başlat
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// ----- EKRAN YÖNETİMİ -----
+const screens = {
+  splash: document.getElementById('splash-screen'),
+  login: document.getElementById('login-screen'),
+  home: document.getElementById('home-screen')
+};
 
-// UI elemanlarını yakala
-const statusDot = document.querySelector('.status-dot');
-const statusLabel = document.querySelector('.status-label');
-const statusText = document.getElementById('status-text');
-
-async function testConnection() {
-  try {
-    statusText.textContent = "Firebase'e bağlanılıyor...";
-
-    // Firestore'a basit bir sorgu at — boş koleksiyon olsa bile cevap dönmeli
-    // Test modu açık olduğu için izin sorunu olmamalı
-    await getDocs(collection(db, '_baglanti_testi'));
-
-    // ✅ Başarılı
-    statusDot.classList.remove('pending');
-    statusDot.classList.add('connected');
-    statusLabel.classList.add('connected');
-    statusLabel.textContent = 'Firebase bağlandı';
-    statusText.textContent = "Faz 0 başarılı — sistem hazır ✓";
-
-    console.log('%c✅ Firebase başarıyla bağlandı', 'color: #00d4aa; font-weight: bold; font-size: 14px');
-    console.log('Proje:', firebaseConfig.projectId);
-    console.log('Auth:', auth);
-    console.log('Firestore:', db);
-  } catch (error) {
-    // ❌ Hata
-    statusDot.classList.remove('pending');
-    statusDot.classList.add('error');
-    statusLabel.classList.add('error');
-    statusLabel.textContent = 'Bağlantı hatası';
-    statusText.textContent = "Hata: " + error.message;
-
-    console.error('%c❌ Firebase bağlantı hatası', 'color: #ff4757; font-weight: bold; font-size: 14px');
-    console.error(error);
-  }
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
 }
 
-testConnection();
+// ----- OTURUM DURUMU -----
+onAuthChange(user => {
+  if (user) {
+    // Giriş yapılmış
+    document.getElementById('welcome-name').textContent = emailToUsername(user.email);
+    showScreen('home');
+    console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
+  } else {
+    // Giriş yok
+    showScreen('login');
+  }
+});
+
+// ----- LOGIN FORM -----
+const loginForm = document.getElementById('login-form');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const loginError = document.getElementById('login-error');
+const loginButton = document.getElementById('login-button');
+const buttonText = loginButton.querySelector('.button-text');
+const buttonLoader = loginButton.querySelector('.button-loader');
+
+function showError(msg) {
+  loginError.textContent = msg;
+  loginError.hidden = false;
+}
+
+function clearError() {
+  loginError.hidden = true;
+  loginError.textContent = '';
+}
+
+function setLoading(loading) {
+  loginButton.disabled = loading;
+  buttonText.hidden = loading;
+  buttonLoader.hidden = !loading;
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError();
+
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!username || !password) {
+    showError('Kullanıcı adı ve şifre gerekli');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    await login(username, password);
+    passwordInput.value = '';
+    // Başarılı — onAuthChange home'a yönlendirecek
+  } catch (error) {
+    setLoading(false);
+    showError(translateAuthError(error.code));
+    console.error('Giriş hatası:', error.code, error.message);
+  }
+});
+
+// ----- ŞİFRE GÖSTER/GİZLE -----
+const togglePassword = document.getElementById('toggle-password');
+togglePassword.addEventListener('click', () => {
+  const isPwd = passwordInput.type === 'password';
+  passwordInput.type = isPwd ? 'text' : 'password';
+  togglePassword.classList.toggle('visible', isPwd);
+  togglePassword.setAttribute('aria-label', isPwd ? 'Şifreyi gizle' : 'Şifreyi göster');
+});
+
+// ----- ÇIKIŞ -----
+const logoutButton = document.getElementById('logout-button');
+logoutButton.addEventListener('click', async () => {
+  if (!confirm('Çıkış yapmak istediğine emin misin?')) return;
+  try {
+    await logout();
+    loginForm.reset();
+    clearError();
+    setLoading(false);
+  } catch (error) {
+    console.error('Çıkış hatası:', error);
+  }
+});
+
+// ----- HATA MESAJI ÇEVİRMENİ -----
+function translateAuthError(code) {
+  const errors = {
+    'auth/invalid-credential': 'Kullanıcı adı veya şifre hatalı',
+    'auth/invalid-email': 'Geçersiz kullanıcı adı',
+    'auth/user-not-found': 'Böyle bir kullanıcı yok',
+    'auth/wrong-password': 'Şifre hatalı',
+    'auth/too-many-requests': 'Çok fazla deneme yaptın, biraz bekle',
+    'auth/network-request-failed': 'İnternet bağlantısı yok',
+    'auth/user-disabled': 'Bu hesap devre dışı',
+    'auth/missing-password': 'Şifre boş olamaz'
+  };
+  return errors[code] || 'Giriş başarısız, tekrar dene';
+}
