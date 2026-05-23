@@ -57,18 +57,18 @@
         </button>
       </form>
 
-      <div class="login-footer">v0.2 — Faz 1</div>
+      <div class="login-footer">v0.3 — Faz 2</div>
     </div>
   </div>
 
-  <!-- HOME (geçici) -->
+  <!-- HOME (4 sekmeli ana yapı) -->
   <div id="home-screen" class="screen">
     <header class="app-header">
       <div class="header-title">
         <span class="brand-mini">SELENIUM</span>
       </div>
       <button id="logout-button" class="icon-button" aria-label="Çıkış yap">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
@@ -76,19 +76,141 @@
       </button>
     </header>
 
-    <main class="home-content">
-      <div class="welcome-box">
-        <div class="welcome-label">Hoşgeldin,</div>
-        <div class="welcome-name" id="welcome-name">—</div>
-      </div>
+    <main class="tab-content-wrapper">
 
-      <div class="info-card">
-        <div class="info-card-title">Faz 1 Tamamlandı ✓</div>
-        <div class="info-card-text">
-          Giriş sistemi çalışıyor. Faz 2'de alt menü çubuğu ve sayfa iskeletleri gelecek.
+      <!-- TAB 1: ANA SAYFA -->
+      <section id="tab-home" class="tab-content active">
+        <div class="welcome-box">
+          <div class="welcome-label">Hoşgeldin,</div>
+          <div class="welcome-name" id="welcome-name">—</div>
         </div>
-      </div>
+
+        <div class="info-card">
+          <div class="info-card-title">Faz 2 Tamamlandı ✓</div>
+          <div class="info-card-text">
+            Alt menü çubuğu hazır. Faz 3'te araç ekleme akışı (marka/model arama, form, hasar şeması) gelecek.
+          </div>
+        </div>
+
+        <div class="placeholder-stats">
+          <div class="stat-card">
+            <div class="stat-label">Aktif Araç</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Toplam Kar</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Satılan</div>
+            <div class="stat-value">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Toplam Masraf</div>
+            <div class="stat-value">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ARAÇLAR -->
+      <section id="tab-vehicles" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Araçlar</h1>
+          <button id="add-vehicle-btn" class="add-btn" aria-label="Yeni araç ekle">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="active">Aktif</button>
+          <button class="sub-tab" data-subtab="sold">Satılanlar</button>
+          <button class="sub-tab" data-subtab="deleted">Silinenler</button>
+        </div>
+
+        <div class="sub-tab-content" id="subtab-active">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17h10M5 17l2-7h10l2 7M5 17v3M19 17v3"/>
+              <circle cx="8" cy="17" r="1"/>
+              <circle cx="16" cy="17" r="1"/>
+            </svg>
+            <p class="empty-title">Henüz araç yok</p>
+            <p class="empty-hint">Faz 3'te araç ekleyebileceksin</p>
+          </div>
+        </div>
+
+        <div class="sub-tab-content" id="subtab-sold" hidden>
+          <div class="empty-state">
+            <p class="empty-title">Satılan araç yok</p>
+          </div>
+        </div>
+
+        <div class="sub-tab-content" id="subtab-deleted" hidden>
+          <div class="empty-state">
+            <p class="empty-title">Silinen araç yok</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: İHALE -->
+      <section id="tab-auction" class="tab-content">
+        <div class="construction-state">
+          <div class="construction-icon">🔨</div>
+          <h2 class="construction-title">İhale Hesaplayıcı</h2>
+          <p class="construction-text">Yapım aşamasında</p>
+          <p class="construction-hint">İhalede vereceğin teklifin ne kadar mantıklı olduğunu hızlıca hesaplayacağın araç. İleride.</p>
+        </div>
+      </section>
+
+      <!-- TAB 4: PROFİL -->
+      <section id="tab-profile" class="tab-content">
+        <div class="construction-state">
+          <div class="construction-icon">⚙️</div>
+          <h2 class="construction-title">Profil & Ayarlar</h2>
+          <p class="construction-text">Yapım aşamasında</p>
+          <p class="construction-hint">Tema ayarları, kara tahta (notlaşma alanı) ve çıkış burada olacak.</p>
+        </div>
+      </section>
+
     </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="home">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12L12 3l9 9"/>
+          <path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/>
+          <path d="M10 21V14h4v7"/>
+        </svg>
+        <span>Ana Sayfa</span>
+      </button>
+      <button class="nav-item" data-tab="vehicles">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 17h10M5 17l2-7h10l2 7M5 17v3M19 17v3"/>
+          <circle cx="8" cy="17" r="1"/>
+          <circle cx="16" cy="17" r="1"/>
+        </svg>
+        <span>Araçlar</span>
+      </button>
+      <button class="nav-item" data-tab="auction">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 13l-7.5 7.5a2.121 2.121 0 0 1-3-3L11 10"/>
+          <path d="M16 16l4-4"/>
+          <path d="M14 7l4-4 4 4-4 4z"/>
+        </svg>
+        <span>İhale</span>
+      </button>
+      <button class="nav-item" data-tab="profile">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Profil</span>
+      </button>
+    </nav>
   </div>
 
   <script type="module" src="js/app.js"></script>
