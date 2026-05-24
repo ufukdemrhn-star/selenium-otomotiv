@@ -1,0 +1,1348 @@
+{
+  "Abarth": {
+    "500e": [],
+    "Cabrio": []
+  },
+  "Acura": {
+    "ILX": [],
+    "MDX": [
+      "3.7"
+    ]
+  },
+  "Aion": {
+    "S": []
+  },
+  "Alfa Romeo": {
+    "145": [],
+    "146": [],
+    "147": [],
+    "155": [],
+    "156": [],
+    "159": [],
+    "166": [],
+    "33": [],
+    "75": [],
+    "Brera": [],
+    "Giulia": [],
+    "Giulia Quadrifoglio": [],
+    "Giulietta": [],
+    "GT": [],
+    "GTV": [],
+    "Junior Elettrica": [],
+    "Junior Ibrida": [],
+    "MiTo": [],
+    "Spider": [],
+    "Sprint": [],
+    "Stelvio": [],
+    "Tonale": []
+  },
+  "Alpine": {
+    "A110": [],
+    "A290": []
+  },
+  "Anadol": {
+    "A": [],
+    "A1": [],
+    "A2": []
+  },
+  "Arora": {
+    "S1": []
+  },
+  "Aston Martin": {
+    "DB11": [],
+    "DB12": [],
+    "DB7": [],
+    "DB9": [],
+    "DBS": [],
+    "DBX": [
+      "DBX V8",
+      "DBX 707"
+    ],
+    "Rapide": [],
+    "Vanquish": [],
+    "Vantage": []
+  },
+  "Audi": {
+    "100 Serisi": [],
+    "200 Serisi": [],
+    "80 Serisi": [],
+    "A1": [],
+    "A3": [],
+    "A4": [],
+    "A5": [],
+    "A6": [],
+    "A6 E-Tron": [],
+    "A7": [],
+    "A8": [],
+    "Cabrio": [],
+    "E-Tron": [],
+    "E-Tron GT": [],
+    "E-Tron Sportback": [],
+    "Q2": [],
+    "Q3": [],
+    "Q3 Sportback": [],
+    "Q4 E-tron": [],
+    "Q4 Sportback": [],
+    "Q5": [],
+    "Q5 Sportback": [],
+    "Q6 E-tron": [],
+    "Q6 E-tron Sportback": [],
+    "Q7": [],
+    "Q8": [],
+    "Q8 E-tron": [],
+    "Q8 E-tron Sportback": [],
+    "R8": [],
+    "RS": [],
+    "RS Q8": [],
+    "S Serisi": [],
+    "SQ7": [],
+    "TT": [],
+    "TTS": []
+  },
+  "Bajaj": {
+    "Qute": []
+  },
+  "Bentley": {
+    "Bentayga": [
+      "4.0 Diesel",
+      "4.0 V8",
+      "6.0"
+    ],
+    "Continental": [],
+    "Flying Spur": [],
+    "Mulsanne": []
+  },
+  "BMW": {
+    "1 Serisi": [],
+    "2 Serisi": [],
+    "3 Serisi": [],
+    "4 Serisi": [],
+    "5 Serisi": [],
+    "6 Serisi": [],
+    "7 Serisi": [],
+    "8 Serisi": [],
+    "i Serisi": [],
+    "iX": [],
+    "iX1": [],
+    "iX2": [],
+    "iX3": [],
+    "M Serisi": [],
+    "X1": [],
+    "X2": [],
+    "X3": [],
+    "X4": [],
+    "X5": [],
+    "X6": [],
+    "Z Serisi": []
+  },
+  "Buick": {
+    "Century": [],
+    "Le Sabre": [],
+    "Park Avenue": [],
+    "Regal": [],
+    "Riviera": [],
+    "Roadmaster": []
+  },
+  "BYD": {
+    "Atto 2": [],
+    "Atto 3 EV": [],
+    "Dolphin": [],
+    "F3": [],
+    "Han": [],
+    "Seal": [],
+    "Seal U DM-i": [],
+    "Seal U EV": [],
+    "Sealion 7": [],
+    "Tang": []
+  },
+  "Cadillac": {
+    "BLS": [],
+    "Brougham": [],
+    "CTS": [],
+    "DeVille": [],
+    "Eldorado": [],
+    "Escalade": [],
+    "Escalade IQ": [],
+    "Fleetwood": [],
+    "Seville": [],
+    "SRX": [],
+    "STS": []
+  },
+  "Chery": {
+    "Alia": [],
+    "Chance": [],
+    "Kimo": [],
+    "Niche": [],
+    "Omoda 5": [],
+    "Omoda 5 Pro": [],
+    "Tiggo 3": [],
+    "Tiggo 7": [],
+    "Tiggo 7 Pro": [],
+    "Tiggo 7 Pro Max": [],
+    "Tiggo 8": [],
+    "Tiggo 8 Pro": [],
+    "Tiggo 8 Pro Max": []
+  },
+  "Chevrolet": {
+    "Avalanche": [],
+    "Aveo": [],
+    "Blazer": [],
+    "Camaro": [],
+    "Caprice": [],
+    "Captiva": [],
+    "Celebrity": [],
+    "Corvette": [],
+    "Cruze": [],
+    "Epica": [],
+    "Equinox": [],
+    "Evanda": [],
+    "HHR": [],
+    "Impala": [],
+    "Kalos": [],
+    "Lacetti": [],
+    "Rezzo": [],
+    "Silverado": [],
+    "Spark": [],
+    "Suburban": [],
+    "Tahoe": [],
+    "Trax": []
+  },
+  "Chrysler": {
+    "300 C": [],
+    "300 M": [],
+    "Concorde": [],
+    "Crossfire": [],
+    "LHS": [],
+    "Neon": [],
+    "Pacifica": [
+      "3.5 L",
+      "3.6 L"
+    ],
+    "PT Cruiser": [],
+    "Sebring": [],
+    "Stratus": []
+  },
+  "Citroen": {
+    "AMI": [],
+    "BX": [],
+    "C-Crosser": [],
+    "C-Elysée": [],
+    "C1": [],
+    "C2": [],
+    "C3": [],
+    "C3 AirCross": [],
+    "C3 Picasso": [],
+    "C4": [],
+    "C4 Cactus": [],
+    "C4 Grand Picasso": [],
+    "C4 Picasso": [],
+    "C4 X": [],
+    "C5": [],
+    "C5 AirCross": [],
+    "C6": [],
+    "C8": [],
+    "e-C3": [],
+    "e-C3 AirCross": [],
+    "e-C4": [],
+    "e-C4 X": [],
+    "e-C5 AirCross": [],
+    "Evasion": [],
+    "Saxo": [],
+    "Xantia": [],
+    "XM": [],
+    "Xsara": [],
+    "ZX": []
+  },
+  "Cupra": {
+    "Ateca": [],
+    "Born": [],
+    "Formentor": [],
+    "Leon": [],
+    "Terramar": []
+  },
+  "Dacia": {
+    "1304": [],
+    "1310": [],
+    "Duster": [],
+    "Jogger": [],
+    "Lodgy": [],
+    "Logan": [],
+    "Logan Pickup": [],
+    "Sandero": [],
+    "Sandero Stepway": [],
+    "Solenza": [],
+    "Spring": []
+  },
+  "Daewoo": {
+    "Espero": [],
+    "Korando": [],
+    "Lanos": [],
+    "Leganza": [],
+    "Matiz": [],
+    "Musso": [],
+    "Nexia": [],
+    "Nubira": [],
+    "Racer": [],
+    "Super Saloon": [],
+    "Tico": []
+  },
+  "Daihatsu": {
+    "Applause": [],
+    "Charade": [],
+    "Copen": [],
+    "Cuore": [],
+    "Feroza": [],
+    "Materia": [],
+    "Move": [],
+    "Rocky": [],
+    "Sirion": [],
+    "Terios": [],
+    "YRV": []
+  },
+  "DFM": {
+    "Rich": [
+      "2.5"
+    ]
+  },
+  "DFSK": {
+    "E5": [],
+    "Fengon": []
+  },
+  "Dodge": {
+    "Avenger": [],
+    "Caliber": [],
+    "Challenger": [],
+    "Charger": [],
+    "Durango": [],
+    "Journey": [],
+    "Magnum": [],
+    "Nitro": [],
+    "Ram": []
+  },
+  "DS Automobiles": {
+    "DS 3": [],
+    "DS 3 Crossback": [],
+    "DS 4": [],
+    "DS 5": [],
+    "DS 7 Crossback": [],
+    "DS 9": []
+  },
+  "Eagle": {
+    "Talon": []
+  },
+  "Ferrari": {
+    "12Cilindri": [],
+    "296": [],
+    "360": [],
+    "430": [],
+    "458": [],
+    "488": [],
+    "575": [],
+    "599": [],
+    "812": [],
+    "California": [],
+    "F12": [],
+    "F355": [],
+    "F8": [],
+    "FF": [],
+    "Portofino": [],
+    "Purosangue": [
+      "V12"
+    ],
+    "Roma": [],
+    "SF90": []
+  },
+  "Fiat": {
+    "124 Spider": [],
+    "126 Bis": [],
+    "500 Ailesi": [],
+    "500 X": [],
+    "600": [],
+    "600e": [],
+    "Albea": [],
+    "Brava": [],
+    "Bravo": [],
+    "Coupe": [],
+    "Croma": [],
+    "Egea": [],
+    "Egea Cross": [],
+    "Freemont": [],
+    "Fullback": [],
+    "Grande Panda Electric": [],
+    "Grande Panda Hybrid": [],
+    "Idea": [],
+    "Linea": [],
+    "Marea": [],
+    "Mirafiori": [],
+    "Multipla": [],
+    "Palio": [],
+    "Panda": [],
+    "Punto": [],
+    "Sedici": [],
+    "Siena": [],
+    "Stilo": [],
+    "Tempra": [],
+    "Tipo": [],
+    "Topolino": [],
+    "Ulysse": []
+  },
+  "Ford": {
+    "B-Max": [],
+    "Bronco Sport": [],
+    "C-Max": [],
+    "Capri": [],
+    "Cougar": [],
+    "EcoSport": [],
+    "Edge": [],
+    "Escort": [],
+    "Expedition": [],
+    "Explorer": [],
+    "Explorer-E": [],
+    "F": [],
+    "Festiva": [],
+    "Fiesta": [],
+    "Flex": [],
+    "Focus": [],
+    "Freestyle": [],
+    "Fusion": [],
+    "Galaxy": [],
+    "Granada": [],
+    "Grand C-Max": [],
+    "Ka": [],
+    "Kuga": [],
+    "Mondeo": [],
+    "Mustang": [],
+    "Mustang Mach-E": [],
+    "Orion": [],
+    "Probe": [],
+    "Puma": [],
+    "Puma-E": [],
+    "Ranger": [],
+    "Ranger Raptor": [],
+    "S-Max": [],
+    "Scorpio": [],
+    "Sierra": [],
+    "Taunus": [],
+    "Taurus": [],
+    "Thunderbird": []
+  },
+  "Forthing": {
+    "M4 U-Tour": [],
+    "T5 Evo": []
+  },
+  "Foton": {
+    "Tunland G7": [],
+    "Tunland V9": []
+  },
+  "Geely": {
+    "Echo": [],
+    "Emgrand": [],
+    "Familia": [],
+    "FC": []
+  },
+  "GMC": {
+    "Canyon": [],
+    "Jimmy": [],
+    "Sierra": [],
+    "Yukon": []
+  },
+  "Haima": {
+    "S7": [
+      "2.0"
+    ]
+  },
+  "Honda": {
+    "Accord": [],
+    "City": [],
+    "Civic": [],
+    "CR-V": [],
+    "CR-Z": [],
+    "CRX": [],
+    "E": [],
+    "HR-V": [],
+    "Integra": [],
+    "Jazz": [],
+    "Legend": [],
+    "Logo": [],
+    "Odyssey": [],
+    "Prelude": [],
+    "S2000": [],
+    "Shuttle": [],
+    "Stream": [],
+    "ZR-V": []
+  },
+  "Hongqi": {
+    "E-HS9": [
+      "Deluxe",
+      "Executive"
+    ]
+  },
+  "Hummer": {
+    "H Serisi": [
+      "H2",
+      "H3"
+    ]
+  },
+  "Hyundai": {
+    "Accent": [],
+    "Accent Blue": [],
+    "Accent Era": [],
+    "Atos": [],
+    "Bayon": [],
+    "Centennial": [],
+    "Coupe": [],
+    "Elantra": [],
+    "Excel": [],
+    "Galloper": [],
+    "Genesis": [],
+    "Getz": [],
+    "Grandeur": [],
+    "i10": [],
+    "i20": [],
+    "i20 Active": [],
+    "i20 N": [],
+    "i20 Troy": [],
+    "i30": [],
+    "i40": [],
+    "Inster": [],
+    "Ioniq": [],
+    "Ioniq 5": [],
+    "Ioniq 5 N": [],
+    "Ioniq 6": [],
+    "Ioniq 9": [],
+    "iX20": [],
+    "ix35": [],
+    "ix55": [],
+    "Kona": [],
+    "Kona Elektrik": [],
+    "Matrix": [],
+    "S-Coupe": [],
+    "Santa Fe": [],
+    "Sonata": [],
+    "Terracan": [],
+    "Trajet": [],
+    "Tucson": []
+  },
+  "Ikco": {
+    "Samand": []
+  },
+  "Infiniti": {
+    "FX": [],
+    "G": [],
+    "I30": [],
+    "M": [],
+    "Q30": [],
+    "Q50": [],
+    "Q60": [],
+    "QX": []
+  },
+  "Isuzu": {
+    "Amigo": [],
+    "D-Max": [],
+    "Trooper": []
+  },
+  "Jaecoo": {
+    "J7": [
+      "1.6",
+      "Evolve",
+      "Revive"
+    ]
+  },
+  "Jaguar": {
+    "Daimler": [],
+    "E-Pace": [],
+    "F-Pace": [],
+    "F-Type": [],
+    "I-Pace": [],
+    "S-Type": [],
+    "Sovereign": [],
+    "X-Type": [],
+    "XE": [],
+    "XF": [],
+    "XJ": [],
+    "XJR": [],
+    "XJS": [],
+    "XK8": [],
+    "XKR": []
+  },
+  "Jeep": {
+    "Avenger Electric": [],
+    "Avenger Hybrid": [],
+    "Cherokee": [],
+    "CJ": [],
+    "Commander": [],
+    "Compass": [],
+    "Grand Cherokee": [],
+    "Patriot": [],
+    "Renegade": [],
+    "Wrangler": []
+  },
+  "Jiayuan": {
+    "Eidola": []
+  },
+  "Joyce": {
+    "One": []
+  },
+  "KGM SsangYong": {
+    "Actyon": [],
+    "Actyon Sports": [],
+    "Korando": [],
+    "Korando Sports": [],
+    "Kyron": [],
+    "Musso": [],
+    "Musso EV": [],
+    "Musso Grand": [],
+    "Rexton": [],
+    "Rodius": [],
+    "Tivoli": [],
+    "Torres": [],
+    "Torres EVX": [],
+    "XLV": []
+  },
+  "Kia": {
+    "Capital": [],
+    "Carens": [],
+    "Carnival": [],
+    "Ceed": [],
+    "Cerato": [],
+    "Clarus": [],
+    "EV3": [],
+    "EV6": [],
+    "EV9": [],
+    "Joice": [],
+    "Magentis": [],
+    "Niro": [],
+    "Niro EV": [],
+    "Opirus": [],
+    "Optima": [],
+    "Picanto": [],
+    "Pride": [],
+    "Pro Ceed": [],
+    "Retona": [],
+    "Rio": [],
+    "Sephia": [],
+    "Shuma": [],
+    "Sorento": [],
+    "Soul": [],
+    "Sportage": [],
+    "Stinger": [],
+    "Stonic": [],
+    "Venga": [],
+    "XCeed": []
+  },
+  "Kuba": {
+    "City": [],
+    "M5": []
+  },
+  "Lada": {
+    "Kalina": [],
+    "Niva": [
+      "1.6",
+      "1.7",
+      "1.7i"
+    ],
+    "Samara": [],
+    "VAZ": [],
+    "Vega": []
+  },
+  "Lamborghini": {
+    "Aventador": [],
+    "Gallardo": [],
+    "Huracan": [],
+    "Revuelto": [],
+    "Temerario": [],
+    "Urus": [
+      "4.0"
+    ]
+  },
+  "Lancia": {
+    "Delta": [],
+    "Kappa": [],
+    "Lybra": [],
+    "Phedra": [],
+    "Thema": [],
+    "Thesis": [],
+    "Y (Ypsilon)": []
+  },
+  "Land Rover": {
+    "Defender": [],
+    "Discovery": [],
+    "Discovery Sport": [],
+    "Freelander": [],
+    "Range Rover": [],
+    "Range Rover Evoque": [],
+    "Range Rover Sport": [],
+    "Range Rover Velar": []
+  },
+  "Leapmotor": {
+    "T03": []
+  },
+  "Lexus": {
+    "CT": [],
+    "ES": [],
+    "GS": [],
+    "IS": [],
+    "LBX": [],
+    "LC": [],
+    "LM": [],
+    "LS": [],
+    "LX": [],
+    "NX": [],
+    "RC": [],
+    "RX": [],
+    "RZ": []
+  },
+  "Lincoln": {
+    "Aviator": [],
+    "Continental": [],
+    "Navigator": [],
+    "Town Car": []
+  },
+  "Lotus": {
+    "Elan": [],
+    "Elise": [],
+    "Emira": [],
+    "Esprit": []
+  },
+  "Luqi": {
+    "EV300": []
+  },
+  "Lynk & Co": {
+    "01": [
+      "1.5 Hybrid"
+    ]
+  },
+  "Mahindra": {
+    "Goa": [],
+    "Pick-up": []
+  },
+  "Marcos": {
+    "Mantis": []
+  },
+  "Maserati": {
+    "2.24v": [],
+    "4 Serisi": [],
+    "Cambiocorsa": [],
+    "Ghibli": [],
+    "GranCabrio": [],
+    "GranCabrio E": [],
+    "GranSport": [],
+    "GranTurismo": [],
+    "GranTurismo E": [],
+    "Grecale": [],
+    "Levante": [],
+    "MC20": [],
+    "Quattroporte": [],
+    "Spyder": []
+  },
+  "Mazda": {
+    "121": [],
+    "2": [],
+    "3": [],
+    "323": [],
+    "5": [],
+    "6": [],
+    "626": [],
+    "B Serisi": [],
+    "CX-3": [],
+    "CX-5": [],
+    "CX-9": [],
+    "Lantis": [],
+    "MPV": [],
+    "MX": [],
+    "Premacy": [],
+    "RX": [],
+    "Xedos": []
+  },
+  "McLaren": {
+    "720S": [],
+    "Artura": [],
+    "GT": []
+  },
+  "Mercedes-Benz": {
+    "190": [],
+    "200": [],
+    "220": [],
+    "230": [],
+    "240": [],
+    "250": [],
+    "260": [],
+    "280": [],
+    "300": [],
+    "320": [],
+    "380": [],
+    "420": [],
+    "500": [],
+    "560": [],
+    "A Serisi": [],
+    "AMG GT": [],
+    "B Serisi": [],
+    "C Serisi": [],
+    "CL": [],
+    "CLA": [],
+    "CLC": [],
+    "CLE": [],
+    "CLK": [],
+    "CLS": [],
+    "E Serisi": [],
+    "EQA": [],
+    "EQB": [],
+    "EQC": [],
+    "EQE": [],
+    "EQS": [],
+    "G Serisi": [],
+    "GL": [],
+    "GLA": [],
+    "GLB": [],
+    "GLC": [],
+    "GLC Coupe": [],
+    "GLE": [],
+    "GLE Coupe": [],
+    "GLK": [],
+    "GLS": [],
+    "Maybach S": [],
+    "ML": [],
+    "R Serisi": [],
+    "S Serisi": [],
+    "SL": [],
+    "SLC": [],
+    "SLK": [],
+    "SLS AMG": [],
+    "X": []
+  },
+  "MG": {
+    "EHS": [],
+    "F": [],
+    "HS": [],
+    "Marvel R": [],
+    "MG3": [],
+    "MG4": [],
+    "MG7": [],
+    "ZR": [],
+    "ZS": [],
+    "ZS EV": [],
+    "ZT": []
+  },
+  "Micro": {
+    "Microlino": []
+  },
+  "Mini": {
+    "Cooper": [],
+    "Cooper Clubman": [],
+    "Cooper Electric": [],
+    "Cooper S": [],
+    "Countryman": [],
+    "Countryman E": [],
+    "John Cooper": [],
+    "One": [],
+    "Paceman": []
+  },
+  "Mitsubishi": {
+    "3000GT": [],
+    "ASX": [],
+    "Attrage": [],
+    "Carisma": [],
+    "Colt": [],
+    "Diamante": [],
+    "Eclipse": [],
+    "Eclipse Cross": [],
+    "Galant": [],
+    "Grandis": [],
+    "L 200": [],
+    "Lancer": [],
+    "Lancer Evolution": [],
+    "Outlander": [],
+    "Pajero": [],
+    "Sigma": [],
+    "Space Star": [],
+    "Space Wagon": []
+  },
+  "Morgan": {
+    "Plus Four": [],
+    "Supersport": []
+  },
+  "Motolux": {
+    "WOW 01": []
+  },
+  "Nieve": {
+    "Evzoom": []
+  },
+  "Nissan": {
+    "200 SX": [],
+    "300 ZX": [],
+    "350 Z": [],
+    "Almera": [],
+    "Altima": [],
+    "Armada": [],
+    "Bluebird": [],
+    "Country": [],
+    "GT-R": [],
+    "Juke": [],
+    "Laurel Altima": [],
+    "Maxima": [],
+    "Micra": [],
+    "Murano": [],
+    "Navara": [],
+    "Note": [],
+    "NX Coupe": [],
+    "Pathfinder": [],
+    "Patrol": [],
+    "Primera": [],
+    "Pulsar": [],
+    "Qashqai": [],
+    "Qashqai+2": [],
+    "Rally Raid": [],
+    "Skyline": [],
+    "Skystar": [],
+    "Sunny": [],
+    "Teana": [],
+    "Terrano": [],
+    "X-Trail": [],
+    "Z": []
+  },
+  "Opel": {
+    "Adam": [],
+    "Agila": [],
+    "Antara": [],
+    "Ascona": [],
+    "Astra": [],
+    "Astra-e": [],
+    "Calibra": [],
+    "Cascada": [],
+    "Corsa": [],
+    "Corsa-e": [],
+    "Crossland": [],
+    "Crossland X": [],
+    "Frontera": [],
+    "Frontera-e": [],
+    "Grandland": [],
+    "Grandland X": [],
+    "Grandland-e": [],
+    "GT (Roadster)": [],
+    "Insignia": [],
+    "Kadett": [],
+    "Manta": [],
+    "Meriva": [],
+    "Mokka": [],
+    "Mokka X": [],
+    "Mokka-e": [],
+    "Omega": [],
+    "Rekord": [],
+    "Signum": [],
+    "Tigra": [],
+    "Vectra": [],
+    "Zafira": []
+  },
+  "Ortimobil": {
+    "Alexa": []
+  },
+  "Peugeot": {
+    "106": [],
+    "107": [],
+    "2008": [],
+    "205": [],
+    "206": [],
+    "206 +": [],
+    "207": [],
+    "208": [],
+    "3008": [],
+    "301": [],
+    "305": [],
+    "306": [],
+    "307": [],
+    "308": [],
+    "4007": [],
+    "405": [],
+    "406": [],
+    "407": [],
+    "408": [],
+    "5008": [],
+    "508": [],
+    "605": [],
+    "607": [],
+    "806": [],
+    "807": [],
+    "e-2008": [],
+    "e-208": [],
+    "e-3008": [],
+    "e-308": [],
+    "e-5008": [],
+    "Pars": [],
+    "RCZ": []
+  },
+  "Plymouth": {
+    "Laser": []
+  },
+  "Polestar": {
+    "Polestar 2 Long Range": []
+  },
+  "Pontiac": {
+    "Bonneville": [],
+    "Firebird": [],
+    "Sunbird": []
+  },
+  "Porsche": {
+    "718": [],
+    "911": [],
+    "Boxster": [],
+    "Cayenne": [],
+    "Cayenne Coupe": [],
+    "Cayenne Elektrik": [],
+    "Cayman": [],
+    "Macan": [],
+    "Macan Elektrik": [],
+    "Panamera": [],
+    "Taycan Elektrik": []
+  },
+  "Proton": {
+    "218": [],
+    "315": [],
+    "415": [],
+    "416": [],
+    "418": [],
+    "420": [],
+    "Gen-2": [],
+    "Saga": [],
+    "Savvy": [],
+    "Waja": []
+  },
+  "Rainwoll": {
+    "RW 10": []
+  },
+  "Reeder": {
+    "Reev Fancy": []
+  },
+  "Regal Raptor": {
+    "K3 KLS": [],
+    "K4": [],
+    "K5": [],
+    "K5 Long": [],
+    "K5 Pro": []
+  },
+  "Relive": {
+    "Baw1": [],
+    "EZI": [],
+    "N1": []
+  },
+  "Renault": {
+    "Austral": [],
+    "Captur": [],
+    "Clio": [],
+    "Duster": [],
+    "Espace": [],
+    "Fluence": [],
+    "Fluence Z.E.": [],
+    "Grand Modüs": [],
+    "Grand Scenic": [],
+    "Kadjar": [],
+    "Koleos": [],
+    "Laguna": [],
+    "Latitude": [],
+    "Megane": [],
+    "Megane E-Tech": [],
+    "Modus": [],
+    "R 11": [],
+    "R 12": [],
+    "R 19": [],
+    "R 21": [],
+    "R 25": [],
+    "R 5": [],
+    "R 9": [],
+    "R5 E-Tech": [],
+    "Rafale": [],
+    "Safrane": [],
+    "Scenic": [],
+    "Scenic RX4": [],
+    "Symbol": [],
+    "Taliant": [],
+    "Talisman": [],
+    "Twingo": [],
+    "Twizy": [],
+    "Vel Satis": [],
+    "ZOE": []
+  },
+  "RKS": {
+    "A1": [],
+    "D2": [],
+    "M5": []
+  },
+  "Rolls-Royce": {
+    "Cullinan": [
+      "6.7"
+    ],
+    "Ghost": [],
+    "Phantom": [],
+    "Spectre": [],
+    "Wraith": []
+  },
+  "Rover": {
+    "200": [],
+    "214": [],
+    "216": [],
+    "220": [],
+    "25": [],
+    "414": [],
+    "416": [],
+    "420": [],
+    "45": [],
+    "620": [],
+    "75": [],
+    "820": [],
+    "Streetwise": []
+  },
+  "Saab": {
+    "9-3": [],
+    "9-5": [],
+    "900": [],
+    "9000": []
+  },
+  "Saipa": {
+    "Saba": []
+  },
+  "Santana": {
+    "2.8 TD": []
+  },
+  "Seat": {
+    "Alhambra": [],
+    "Altea": [],
+    "Arona": [],
+    "Arosa": [],
+    "Ateca": [],
+    "Cordoba": [],
+    "Exeo": [],
+    "Ibiza": [],
+    "Leon": [],
+    "Marbella": [],
+    "Tarraco": [],
+    "Toledo": []
+  },
+  "Seres": {
+    "3 Serisi": [
+      "3"
+    ]
+  },
+  "Skoda": {
+    "Citigo": [],
+    "Elroq": [],
+    "Enyaq": [],
+    "Enyaq Coupe": [],
+    "Fabia": [],
+    "Favorit": [],
+    "Felicia": [],
+    "Felicia Pickup": [],
+    "Forman": [],
+    "Kamiq": [],
+    "Karoq": [],
+    "Kodiaq": [],
+    "Octavia": [],
+    "Rapid": [],
+    "Roomster": [],
+    "Scala": [],
+    "Superb": [],
+    "Yeti": []
+  },
+  "Skywell": {
+    "ET5": [
+      "Exclusive",
+      "Legend",
+      "Premium Line",
+      "Premium Plus"
+    ]
+  },
+  "Smart": {
+    "Forfour": [],
+    "Fortwo": [],
+    "Roadster": []
+  },
+  "Subaru": {
+    "BRZ": [],
+    "Crosstrek": [],
+    "Forester": [],
+    "Impreza": [],
+    "Justy": [],
+    "Legacy": [],
+    "Leone": [],
+    "Levorg": [],
+    "Outback": [],
+    "Solterra": [],
+    "Tribeca (B9)": [],
+    "Vivio": [],
+    "XV": []
+  },
+  "Suzuki": {
+    "Alto": [],
+    "Baleno": [],
+    "Grand Vitara": [],
+    "Jimny": [],
+    "Liana": [],
+    "Maruti": [],
+    "S-Cross": [],
+    "SJ": [],
+    "Splash": [],
+    "Swift": [],
+    "SX4": [],
+    "Vitara": [],
+    "Wagon R": []
+  },
+  "SWM": {
+    "G01": [],
+    "G01 Pro": [],
+    "G01F": [],
+    "G03F": []
+  },
+  "Tata": {
+    "Indica": [],
+    "Indigo": [],
+    "Manza": [],
+    "Marina": [],
+    "Safari": [],
+    "Telcoline": [],
+    "Vista": [],
+    "Xenon": []
+  },
+  "Tesla": {
+    "Model 3": [],
+    "Model S": [],
+    "Model X": [],
+    "Model Y": []
+  },
+  "The London Taxi": {
+    "TX4": []
+  },
+  "Tofaş": {
+    "Doğan": [],
+    "Kartal": [],
+    "Murat": [],
+    "Serçe": [],
+    "Şahin": []
+  },
+  "TOGG": {
+    "T10F": [],
+    "T10X": [
+      "V1",
+      "V2"
+    ],
+    "V1": [],
+    "V2": []
+  },
+  "Toyota": {
+    "4Runner": [],
+    "Auris": [],
+    "Avalon": [],
+    "Avensis": [],
+    "C-HR": [],
+    "Camry": [],
+    "Carina": [],
+    "Celica": [],
+    "Corolla": [],
+    "Corolla Cross": [],
+    "Corona": [],
+    "Cressida": [],
+    "Crown": [],
+    "FJ Cruiser": [],
+    "Fortuner": [],
+    "GT86": [],
+    "Hilux": [],
+    "Land Cruiser": [],
+    "Land Cruiser Prado": [],
+    "MR2": [],
+    "Previa": [],
+    "Prius": [],
+    "RAV4": [],
+    "Starlet": [],
+    "Supra": [],
+    "Tercel": [],
+    "Urban Cruiser": [],
+    "Verso": [],
+    "Yaris": [],
+    "Yaris Cross": []
+  },
+  "Vanderhall": {
+    "Carmel GTS": [],
+    "Venice": [],
+    "Venice GT": [],
+    "Venice GTS": []
+  },
+  "Volkswagen": {
+    "Amarok": [],
+    "Arteon": [],
+    "Beetle": [],
+    "Bora": [],
+    "EOS": [],
+    "Golf": [],
+    "ID.3": [],
+    "ID.4": [],
+    "ID.6": [],
+    "ID.7": [],
+    "Jetta": [],
+    "Lupo": [],
+    "Passat": [],
+    "Passat Alltrack": [],
+    "Passat Variant": [],
+    "Phaeton": [],
+    "Polo": [],
+    "Scirocco": [],
+    "Sharan": [],
+    "T-Cross": [],
+    "T-Roc": [],
+    "Taigo": [],
+    "Tayron": [],
+    "Tiguan": [],
+    "Tiguan AllSpace": [],
+    "Touareg": [],
+    "Touran": [],
+    "Up Club": [],
+    "Vento": [],
+    "VW CC": []
+  },
+  "Volta": {
+    "EV1": [],
+    "EV2": [],
+    "V1": []
+  },
+  "Volvo": {
+    "440": [],
+    "740": [],
+    "850": [],
+    "940": [],
+    "960": [],
+    "C30": [],
+    "C40": [],
+    "C70": [],
+    "EC40": [],
+    "EX30": [],
+    "EX40": [],
+    "S40": [],
+    "S60": [],
+    "S70": [],
+    "S80": [],
+    "S90": [],
+    "V40": [],
+    "V40 Cross Country": [],
+    "V50": [],
+    "V60": [],
+    "V60 Cross Country": [],
+    "V70": [],
+    "V90 Cross Country": [],
+    "XC40": [],
+    "XC60": [],
+    "XC70": [],
+    "XC90": []
+  },
+  "Voyah": {
+    "Free": [
+      "High Plus"
+    ]
+  },
+  "XEV": {
+    "Yoyo": []
+  },
+  "Yuki": {
+    "Amy": [],
+    "Hector Pro": []
+  },
+  "Zlin Motors": {
+    "Spark": [],
+    "Spark-H": []
+  }
+}
