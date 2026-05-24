@@ -86,7 +86,6 @@ logoutButton.addEventListener('click', async () => {
     loginForm.reset();
     clearError();
     setLoading(false);
-    // Sekmeyi ana sayfaya sıfırla ki bir sonraki girişte düzgün açılsın
     switchTab('home');
   } catch (error) {
     console.error('Çıkış hatası:', error);
@@ -123,4 +122,27 @@ navItems.forEach(btn => {
 });
 
 // ============================================================
-// ARAÇLAR ALT SEKMELERI (Aktif / Satıla
+// ARAÇLAR ALT SEKMELERİ (Aktif / Satılan / Silinen)
+// ============================================================
+const subTabs = document.querySelectorAll('.sub-tab');
+const subTabContents = document.querySelectorAll('.sub-tab-content');
+
+subTabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.subtab;
+    subTabs.forEach(b => b.classList.toggle('active', b.dataset.subtab === target));
+    subTabContents.forEach(c => {
+      c.hidden = (c.id !== `subtab-${target}`);
+    });
+  });
+});
+
+// ============================================================
+// ARAÇ EKLEME (Faz 3'te dolduracağız)
+// ============================================================
+const addVehicleBtn = document.getElementById('add-vehicle-btn');
+if (addVehicleBtn) {
+  addVehicleBtn.addEventListener('click', () => {
+    alert('Araç ekleme akışı Faz 3\'te gelecek 🚗');
+  });
+}
