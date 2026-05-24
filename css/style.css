@@ -313,13 +313,15 @@ button {
 .tab-content-wrapper {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem);
 }
 
 .tab-content {
   display: none;
   padding: 1.5rem 1.2rem;
   animation: fadeIn 0.25s ease-out;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .tab-content.active {
@@ -532,3 +534,94 @@ button {
 
 .construction-hint {
   font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ============================================ */
+/* BOTTOM NAV - SAYFANIN EN ALTINDA SABİT BAR    */
+/* ============================================ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-nav .nav-item {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.75rem 0.3rem 0.6rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+  position: relative;
+  outline: none;
+  font-family: inherit;
+}
+
+.bottom-nav .nav-item span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.bottom-nav .nav-item:hover {
+  color: var(--text-secondary);
+}
+
+.bottom-nav .nav-item.active {
+  color: var(--accent);
+}
+
+.bottom-nav .nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.bottom-nav .nav-item svg {
+  transition: transform 0.2s;
+  display: block;
+}
+
+.bottom-nav .nav-item.active svg {
+  filter: drop-shadow(0 0 4px var(--accent-glow));
+  transform: scale(1.05);
+}
+
+/* Geniş ekranlarda (PC) alt nav'i ortala */
+@media (min-width: 900px) {
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: 600px;
+    width: 600px;
+    border-radius: 16px 16px 0 0;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+}
