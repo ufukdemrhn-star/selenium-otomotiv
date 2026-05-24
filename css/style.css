@@ -25,6 +25,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* hidden attribute'u her zaman gizlesin (display: flex'i bile yener) */
+[hidden] {
+  display: none !important;
+}
+
 html, body {
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
