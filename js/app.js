@@ -1,7 +1,8 @@
 // ============================================================
-// FAZ 2 — Ana uygulama + alt menü navigasyonu
+// FAZ 3.B — Ana uygulama + wizard entegrasyonu
 // ============================================================
 import { onAuthChange, login, logout, emailToUsername } from "./auth.js";
+import { openWizard } from "./wizard.js";
 
 // ----- EKRAN YÖNETİMİ -----
 const screens = {
@@ -138,11 +139,9 @@ subTabs.forEach(btn => {
 });
 
 // ============================================================
-// ARAÇ EKLEME (Faz 3'te dolduracağız)
+// ARAÇ EKLEME WIZARD'I BAŞLAT
 // ============================================================
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) {
-  addVehicleBtn.addEventListener('click', () => {
-    alert('Araç ekleme akışı Faz 3\'te gelecek 🚗');
-  });
+  addVehicleBtn.addEventListener('click', openWizard);
 }
