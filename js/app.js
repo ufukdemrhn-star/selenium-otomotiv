@@ -1,8 +1,8 @@
 // ============================================================
 // FAZ 4 — Ana uygulama + wizard entegrasyonu
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=7";
-import { openWizard } from "./wizard.js?v=7";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=8";
+import { openWizard } from "./wizard.js?v=8";
 
 // ----- EKRAN YÖNETİMİ -----
 const screens = {
@@ -70,7 +70,6 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Şifre göster/gizle
 const togglePassword = document.getElementById('toggle-password');
 togglePassword.addEventListener('click', () => {
   const isPwd = passwordInput.type === 'password';
@@ -78,7 +77,6 @@ togglePassword.addEventListener('click', () => {
   togglePassword.classList.toggle('visible', isPwd);
 });
 
-// Çıkış
 const logoutButton = document.getElementById('logout-button');
 logoutButton.addEventListener('click', async () => {
   if (!confirm('Çıkış yapmak istediğine emin misin?')) return;
@@ -107,9 +105,7 @@ function translateAuthError(code) {
   return errors[code] || 'Giriş başarısız, tekrar dene';
 }
 
-// ============================================================
-// ALT MENÜ NAVİGASYONU
-// ============================================================
+// ----- NAVİGASYON -----
 const navItems = document.querySelectorAll('.nav-item');
 const tabContents = document.querySelectorAll('.tab-content');
 
@@ -122,9 +118,7 @@ navItems.forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-// ============================================================
-// ARAÇLAR ALT SEKMELERİ (Aktif / Satılan / Silinen)
-// ============================================================
+// ----- ALT SEKMELER -----
 const subTabs = document.querySelectorAll('.sub-tab');
 const subTabContents = document.querySelectorAll('.sub-tab-content');
 
@@ -138,12 +132,10 @@ subTabs.forEach(btn => {
   });
 });
 
-// ============================================================
-// ARAÇ EKLEME WIZARD'I BAŞLAT
-// ============================================================
+// ----- ARAÇ EKLEME -----
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) {
   addVehicleBtn.addEventListener('click', openWizard);
 }
 
-console.log('🚗 Selenium Otomotiv v0.5 — Faz 4 yüklendi');
+console.log('🚗 Selenium Otomotiv v0.5 — Faz 4 v8 yüklendi');
