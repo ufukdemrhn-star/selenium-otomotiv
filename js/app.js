@@ -1,10 +1,10 @@
 // ============================================================
-// FAZ 4 — Ana uygulama + wizard entegrasyonu
+// FAZ 5 — Ana uygulama + wizard + araç listesi
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=8";
-import { openWizard } from "./wizard.js?v=8";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=9";
+import { openWizard } from "./wizard.js?v=9";
+import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=9";
 
-// ----- EKRAN YÖNETİMİ -----
 const screens = {
   splash: document.getElementById('splash-screen'),
   login: document.getElementById('login-screen'),
@@ -16,18 +16,27 @@ function showScreen(name) {
   screens[name].classList.add('active');
 }
 
-// ----- OTURUM DURUMU -----
+let vehicleListInitialized = false;
+
 onAuthChange(user => {
   if (user) {
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
+    // Araç listesini başlat (sadece bir kez)
+    if (!vehicleListInitialized) {
+      initVehicleList();
+      vehicleListInitialized = true;
+    }
   } else {
     showScreen('login');
+    if (vehicleListInitialized) {
+      stopVehicleList();
+      vehicleListInitialized = false;
+    }
   }
 });
 
-// ----- LOGIN FORM -----
 const loginForm = document.getElementById('login-form');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
@@ -105,7 +114,6 @@ function translateAuthError(code) {
   return errors[code] || 'Giriş başarısız, tekrar dene';
 }
 
-// ----- NAVİGASYON -----
 const navItems = document.querySelectorAll('.nav-item');
 const tabContents = document.querySelectorAll('.tab-content');
 
@@ -118,7 +126,6 @@ navItems.forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-// ----- ALT SEKMELER -----
 const subTabs = document.querySelectorAll('.sub-tab');
 const subTabContents = document.querySelectorAll('.sub-tab-content');
 
@@ -132,10 +139,9 @@ subTabs.forEach(btn => {
   });
 });
 
-// ----- ARAÇ EKLEME -----
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) {
   addVehicleBtn.addEventListener('click', openWizard);
 }
 
-console.log('🚗 Selenium Otomotiv v0.5 — Faz 4 v8 yüklendi');
+console.log('🚗 Selenium Otomotiv v0.6 — Faz 5 yüklendi');
