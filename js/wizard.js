@@ -1,8 +1,9 @@
 // ============================================================
-// wizard.js — Yeni araç ekleme wizard'ı
-// Faz 4: Adım 1 (marka/model) + Adım 2 (araç bilgileri)
-// Adım 3 (hasar şeması + kaydet) Faz 5'te gelecek
+// wizard.js — Yeni araç ekleme wizard'ı (FAZ 4)
+// Step 1: marka/model/seri | Step 2: araç bilgileri
 // ============================================================
+console.log('🧙 wizard.js v7 yüklendi (Faz 4 - 2 adımlı)');
+
 import {
   getAllBrands,
   addBrand,
@@ -10,8 +11,8 @@ import {
   addSeries,
   getModelsForBrand,
   getSeriesForModel
-} from "./brands-db.js";
-import { createSearchableList } from "./vehicle-search.js";
+} from "./brands-db.js?v=7";
+import { createSearchableList } from "./vehicle-search.js?v=7";
 import {
   createYearWheel,
   createSegmented,
@@ -19,7 +20,7 @@ import {
   createNumberInput,
   createRadioGroup,
   createToggle
-} from "./form-components.js";
+} from "./form-components.js?v=7";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
