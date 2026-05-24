@@ -1,8 +1,8 @@
 // ============================================================
-// FAZ 3.B — Ana uygulama + wizard entegrasyonu
+// FAZ 4 — Ana uygulama + wizard entegrasyonu
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js";
-import { openWizard } from "./wizard.js";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=7";
+import { openWizard } from "./wizard.js?v=7";
 
 // ----- EKRAN YÖNETİMİ -----
 const screens = {
@@ -145,3 +145,5 @@ const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) {
   addVehicleBtn.addEventListener('click', openWizard);
 }
+
+console.log('🚗 Selenium Otomotiv v0.5 — Faz 4 yüklendi');
