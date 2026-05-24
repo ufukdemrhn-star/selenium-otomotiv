@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selenium — Veritabanı Yükleme</title>
+  <link rel="stylesheet" href="css/style.css?v=3">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .seed-container {
+      max-width: 500px;
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .seed-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .seed-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .seed-desc { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    .seed-stats {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .seed-stats .stat-line { margin: 0.3rem 0; }
+    .seed-stats .stat-num { color: var(--accent); font-weight: 700; }
+    .progress-wrapper {
+      background: var(--bg-tertiary);
+      border-radius: 10px;
+      height: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #00ff88);
+      width: 0%;
+      transition: width 0.2s;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    .progress-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      min-height: 1.4em;
+    }
+    .seed-button {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border: none;
+      border-radius: 12px;
+      padding: 1rem;
+      color: #003228;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 212, 170, 0.25);
+    }
+    .seed-button:hover { box-shadow: 0 6px 24px rgba(0, 212, 170, 0.4); }
+    .seed-button:active { transform: scale(0.98); }
+    .seed-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .danger-button {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 0.7rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-top: 0.8rem;
+    }
+    .danger-button:hover { background: rgba(255, 71, 87, 0.1); }
+    .log-box {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.75rem;
+      text-align: left;
+      margin-top: 1rem;
+      color: var(--text-secondary);
+      display: none;
+    }
+    .log-box.visible { display: block; }
+    .log-line { margin: 2px 0; }
+    .log-line.success { color: var(--success); }
+    .log-line.error { color: var(--error); }
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="seed-container">
+    <div class="seed-icon">🌱</div>
+    <div class="seed-title">Veritabanı Yükleme</div>
+    <div class="seed-desc">
+      Marka/model listesini Firestore'a tek seferlik yüklemek için bu sayfayı kullan.
+      <strong>Sadece bir kez çalıştır</strong>, sonra <code>seed.html</code> dosyasını GitHub'dan silebilirsin.
+    </div>
+
+    <div class="seed-stats" id="stats">
+      <div class="stat-line">Yüklenecek: <span class="stat-num" id="brand-count">—</span> marka</div>
+      <div class="stat-line">Toplam: <span class="stat-num" id="model-count">—</span> model</div>
+      <div class="stat-line">Mevcut Firestore: <span class="stat-num" id="existing-count">—</span> marka</div>
+    </div>
+
+    <div class="progress-wrapper" id="progress-wrapper">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="progress-text" id="progress-text"></div>
+
+    <button id="seed-button" class="seed-button">Veritabanını Yükle</button>
+    <button id="reset-button" class="danger-button" hidden>
+      🗑️ Tüm marka verisini sil (sıfırla)
+    </button>
+
+    <div id="log" class="log-box"></div>
+
+    <a href="index.html" class="back-link">← Ana uygulamaya dön</a>
+  </div>
+
+  <script type="module">
+    import { db } from "./js/firebase.js?v=3";
+    import {
+      collection,
+      doc,
+      setDoc,
+      getDocs,
+      deleteDoc,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const brandCountEl = document.getElementById('brand-count');
+    const modelCountEl = document.getElementById('model-count');
+    const existingCountEl = document.getElementById('existing-count');
+    const progressWrapper = document.getElementById('progress-wrapper');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const seedButton = document.getElementById('seed-button');
+    const resetButton = document.getElementById('reset-button');
+    const logBox = document.getElementById('log');
+
+    let brandsData = null;
+
+    function log(msg, type = '') {
+      logBox.classList.add('visible');
+      const line = document.createElement('div');
+      line.className = 'log-line ' + type;
+      line.textContent = msg;
+      logBox.appendChild(line);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function setProgress(percent, text) {
+      progressWrapper.style.display = 'block';
+      progressBar.style.width = percent + '%';
+      progressText.textContent = text || '';
+    }
+
+    async function loadBrandsJson() {
+      try {
+        const res = await fetch('data/brands.json?v=' + Date.now());
+        if (!res.ok) throw new Error('brands.json yüklenemedi: ' + res.status);
+        brandsData = await res.json();
+        const brandCount = Object.keys(brandsData).length;
+        const modelCount = Object.values(brandsData)
+          .reduce((sum, models) => sum + Object.keys(models).length, 0);
+        brandCountEl.textContent = brandCount;
+        modelCountEl.textContent = modelCount;
+        log(`✓ brands.json yüklendi: ${brandCount} marka, ${modelCount} model`, 'success');
+      } catch (err) {
+        log('✗ brands.json yüklenemedi: ' + err.message, 'error');
+        brandCountEl.textContent = 'HATA';
+        seedButton.disabled = true;
+      }
+    }
+
+    async function checkExisting() {
+      try {
+        const snapshot = await getDocs(collection(db, 'brands'));
+        existingCountEl.textContent = snapshot.size;
+        if (snapshot.size > 0) {
+          resetButton.hidden = false;
+          log(`ℹ️ Firestore'da zaten ${snapshot.size} marka var`);
+        }
+      } catch (err) {
+        existingCountEl.textContent = '?';
+        log('✗ Firestore okunamadı: ' + err.message, 'error');
+      }
+    }
+
+    async function seedDatabase() {
+      if (!brandsData) {
+        log('✗ Veri yüklenmedi', 'error');
+        return;
+      }
+
+      seedButton.disabled = true;
+      seedButton.textContent = 'Yükleniyor...';
+      log('🚀 Yükleme başladı...');
+
+      const brands = Object.entries(brandsData);
+      const total = brands.length;
+      let done = 0;
+      let errors = 0;
+
+      // Firestore batch limit 500 → 116 marka tek batch'e sığar
+      // Ama yine de güvenli olsun diye batch'leri 100 ile sınırlayalım
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < total; i += BATCH_SIZE) {
+        const batch = writeBatch(db);
+        const chunk = brands.slice(i, i + BATCH_SIZE);
+
+        for (const [brandName, models] of chunk) {
+          // Modelleri { models: { "Accord": { series: [...] } } } yapısına çevir
+          const modelsObj = {};
+          for (const [modelName, seriesList] of Object.entries(models)) {
+            modelsObj[modelName] = { series: seriesList || [] };
+          }
+
+          const brandRef = doc(db, 'brands', brandName);
+          batch.set(brandRef, {
+            name: brandName,
+            models: modelsObj,
+            createdAt: new Date().toISOString()
+          });
+        }
+
+        try {
+          await batch.commit();
+          done += chunk.length;
+          const percent = Math.round((done / total) * 100);
+          setProgress(percent, `${done} / ${total} marka yüklendi`);
+          log(`✓ Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${chunk.length} marka`, 'success');
+        } catch (err) {
+          errors += chunk.length;
+          log(`✗ Batch hatası: ${err.message}`, 'error');
+        }
+      }
+
+      if (errors === 0) {
+        setProgress(100, '✓ Tüm markalar başarıyla yüklendi!');
+        seedButton.textContent = '✓ Tamamlandı';
+        seedButton.style.background = 'var(--success)';
+        log(`🎉 BAŞARILI: ${done} marka Firestore'a yüklendi`, 'success');
+        log('Bu sayfayı GitHub\'dan silebilirsin.', 'success');
+        resetButton.hidden = false;
+      } else {
+        seedButton.disabled = false;
+        seedButton.textContent = 'Tekrar Dene';
+        log(`⚠️ ${done} başarılı, ${errors} hata`, 'error');
+      }
+
+      await checkExisting();
+    }
+
+    async function resetDatabase() {
+      if (!confirm('TÜM marka verisi silinecek, emin misin?')) return;
+      if (!confirm('Gerçekten emin misin? Bu işlem geri alınamaz.')) return;
+
+      resetButton.disabled = true;
+      log('🗑️ Silme başladı...');
+
+      try {
+        const snapshot = await getDocs(collection(db, 'brands'));
+        const total = snapshot.size;
+        let done = 0;
+
+        const docs = snapshot.docs;
+        const BATCH_SIZE = 100;
+
+        for (let i = 0; i < docs.length; i += BATCH_SIZE) {
+          const batch = writeBatch(db);
+          const chunk = docs.slice(i, i + BATCH_SIZE);
+
+          for (const d of chunk) {
+            batch.delete(d.ref);
+          }
+
+          await batch.commit();
+          done += chunk.length;
+          const percent = Math.round((done / total) * 100);
+          setProgress(percent, `${done} / ${total} marka silindi`);
+        }
+
+        log(`✓ ${done} marka silindi`, 'success');
+        seedButton.disabled = false;
+        seedButton.textContent = 'Veritabanını Yükle';
+        seedButton.style.background = '';
+        resetButton.disabled = false;
+        await checkExisting();
+      } catch (err) {
+        log('✗ Silme hatası: ' + err.message, 'error');
+        resetButton.disabled = false;
+      }
+    }
+
+    seedButton.addEventListener('click', seedDatabase);
+    resetButton.addEventListener('click', resetDatabase);
+
+    // Başlangıçta JSON yükle ve mevcut durum kontrol
+    (async () => {
+      await loadBrandsJson();
+      await checkExisting();
+    })();
+  </script>
+</body>
+</html>
