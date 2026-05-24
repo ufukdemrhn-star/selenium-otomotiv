@@ -1055,3 +1055,11 @@ button { font-family: inherit; }
 }
 .toggle-switch.off .off-label { color: #003228; }
 .toggle-switch.on .on-label { color: #fff; }
+
+/* Custom input block (motor gücü "Diğer" seçildiğinde altta açılan input) */
+.custom-input-block {
+  margin-top: 0.6rem;
+}
+.custom-input-block:not([hidden]) {
+  animation: fadeIn 0.2s ease-out;
+}
