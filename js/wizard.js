@@ -1,8 +1,8 @@
 // ============================================================
-// wizard.js — Yeni araç ekleme wizard'ı (FAZ 4)
-// Step 1: marka/model/seri | Step 2: araç bilgileri
+// wizard.js — Yeni araç ekleme wizard'ı (FAZ 4 v8)
+// Step 1: marka/model/seri | Step 2: araç bilgileri (opsiyonel)
 // ============================================================
-console.log('🧙 wizard.js v7 yüklendi (Faz 4 - 2 adımlı)');
+console.log('🧙 wizard.js v8 yüklendi (opsiyonel alanlar + diğer HP + otomatik kapı)');
 
 import {
   getAllBrands,
@@ -11,8 +11,8 @@ import {
   addSeries,
   getModelsForBrand,
   getSeriesForModel
-} from "./brands-db.js?v=7";
-import { createSearchableList } from "./vehicle-search.js?v=7";
+} from "./brands-db.js?v=8";
+import { createSearchableList } from "./vehicle-search.js?v=8";
 import {
   createYearWheel,
   createSegmented,
@@ -20,7 +20,7 @@ import {
   createNumberInput,
   createRadioGroup,
   createToggle
-} from "./form-components.js?v=7";
+} from "./form-components.js?v=8";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
@@ -41,14 +41,15 @@ const initialState = () => ({
   selectedModel: null,
   selectedSeries: null,
 
-  // Step 2
+  // Step 2 (hepsi opsiyonel)
   purchasePrice: null,
   year: 2010,
   km: null,
   transmission: null,
   fuel: null,
   bodyType: null,
-  enginePower: null,
+  enginePower: null,         // kategori veya 'custom'
+  customEnginePower: null,   // 'custom' seçildiğinde tam sayı
   drive: null,
   doors: null,
   heavyDamage: false
@@ -56,7 +57,6 @@ const initialState = () => ({
 
 let state = initialState();
 
-// Komponentler — step değiştirince destroy edip yeniden oluşturalım
 let brandSearch = null;
 let modelSearch = null;
 let seriesSearch = null;
@@ -85,8 +85,18 @@ const BODY_OPTIONS = [
   { value: 'sedan', label: 'Sedan' }
 ];
 
+// Kasa tipi → otomatik kapı sayısı eşlemesi
+const BODY_TO_DOORS = {
+  'hatchback_3': '3',
+  'hatchback_5': '5',
+  'sedan': '4'
+};
+
 const ENGINE_POWER_OPTIONS = (() => {
-  const opts = [{ value: 'le50', label: "50 HP'ye kadar" }];
+  const opts = [
+    { value: 'custom', label: '✏️ Diğer (tam değer gir)' },
+    { value: 'le50', label: "50 HP'ye kadar" }
+  ];
   const ranges = [
     [51, 75], [76, 100], [101, 125], [126, 150], [151, 175], [176, 200],
     [201, 225], [226, 250], [251, 275], [276, 300], [301, 325], [326, 350],
@@ -119,11 +129,9 @@ export async function openWizard() {
   wizard.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Step 2 alanını temizle (önceki açılıştan kalmış olabilir)
   resetStep2DOM();
   showStep(1);
 
-  // Loading göster, markaları çek
   const loadingEl = document.getElementById('wizard-loading');
   loadingEl.hidden = false;
 
@@ -152,7 +160,6 @@ function closeWizard(skipConfirm = false) {
   wizard.classList.remove('open');
   document.body.style.overflow = '';
 
-  // Cleanup
   step2Components = {};
   resetStep1DOM();
   state = initialState();
@@ -174,6 +181,8 @@ function resetStep2DOM() {
   document.querySelectorAll('#step-2 [data-component]').forEach(el => {
     el.innerHTML = '';
   });
+  const customBlock = document.querySelector('[data-component="custom-engine-power"]');
+  if (customBlock) customBlock.hidden = true;
 }
 
 // ============================================================
@@ -201,7 +210,6 @@ function showStep(n) {
     updateNextButton();
   }
 
-  // Sayfayı en başa kaydır
   document.querySelector('.wizard-body').scrollTop = 0;
 }
 
@@ -354,10 +362,10 @@ async function addNewSeries(seriesName) {
 }
 
 // ============================================================
-// STEP 2 — ARAÇ BİLGİLERİ
+// STEP 2 — ARAÇ BİLGİLERİ (HEPSİ OPSİYONEL)
 // ============================================================
 function initStep2() {
-  // Üst özet kartı
+  // Özet kartı
   const summaryEl = document.getElementById('step2-summary');
   const summaryText = [state.selectedBrand, state.selectedModel, state.selectedSeries]
     .filter(Boolean).join(' · ');
@@ -369,7 +377,7 @@ function initStep2() {
     placeholder: '0',
     suffix: '₺',
     value: state.purchasePrice,
-    onChange: (v) => { state.purchasePrice = v; updateNextButton(); }
+    onChange: (v) => { state.purchasePrice = v; }
   });
 
   // Yıl wheel
@@ -387,7 +395,7 @@ function initStep2() {
     placeholder: '0',
     suffix: 'km',
     value: state.km,
-    onChange: (v) => { state.km = v; updateNextButton(); }
+    onChange: (v) => { state.km = v; }
   });
 
   // Vites
@@ -398,7 +406,7 @@ function initStep2() {
       { value: 'manuel', label: 'Manuel' }
     ],
     value: state.transmission,
-    onChange: (v) => { state.transmission = v; updateNextButton(); }
+    onChange: (v) => { state.transmission = v; }
   });
 
   // Yakıt
@@ -407,25 +415,58 @@ function initStep2() {
     options: FUEL_OPTIONS,
     placeholder: 'Yakıt tipi seç',
     value: state.fuel,
-    onChange: (v) => { state.fuel = v; updateNextButton(); }
+    onChange: (v) => { state.fuel = v; }
   });
 
-  // Kasa tipi
+  // Kasa tipi — seçilince kapı sayısını da otomatik ayarla
   step2Components.bodyType = createDropdown({
     container: document.querySelector('[data-component="body-type"]'),
     options: BODY_OPTIONS,
     placeholder: 'Kasa tipi seç',
     value: state.bodyType,
-    onChange: (v) => { state.bodyType = v; updateNextButton(); }
+    onChange: (v) => {
+      state.bodyType = v;
+      // Otomatik kapı seçimi
+      if (BODY_TO_DOORS[v]) {
+        state.doors = BODY_TO_DOORS[v];
+        if (step2Components.doors) {
+          step2Components.doors.setValue(BODY_TO_DOORS[v]);
+        }
+      }
+    }
   });
 
-  // Motor gücü
+  // Motor gücü — "Diğer" seçilirse custom input açılır
+  const customEngineBlock = document.querySelector('[data-component="custom-engine-power"]');
   step2Components.enginePower = createDropdown({
     container: document.querySelector('[data-component="engine-power"]'),
     options: ENGINE_POWER_OPTIONS,
     placeholder: 'Motor gücü seç',
     value: state.enginePower,
-    onChange: (v) => { state.enginePower = v; updateNextButton(); }
+    onChange: (v) => {
+      state.enginePower = v;
+      if (v === 'custom') {
+        // Custom HP input'unu göster ve oluştur (yoksa)
+        customEngineBlock.hidden = false;
+        if (!step2Components.customEnginePower) {
+          step2Components.customEnginePower = createNumberInput({
+            container: customEngineBlock,
+            placeholder: 'Tam HP değeri (örn. 156)',
+            suffix: 'HP',
+            value: state.customEnginePower,
+            maxLength: 4,
+            onChange: (val) => { state.customEnginePower = val; }
+          });
+          setTimeout(() => {
+            const input = customEngineBlock.querySelector('.number-input');
+            if (input) input.focus();
+          }, 50);
+        }
+      } else {
+        customEngineBlock.hidden = true;
+        state.customEnginePower = null;
+      }
+    }
   });
 
   // Çekiş
@@ -434,10 +475,10 @@ function initStep2() {
     options: DRIVE_OPTIONS,
     placeholder: 'Çekiş tipi seç',
     value: state.drive,
-    onChange: (v) => { state.drive = v; updateNextButton(); }
+    onChange: (v) => { state.drive = v; }
   });
 
-  // Kapı sayısı
+  // Kapı sayısı (manuel değiştirilebilir, kasa tipinden otomatik ayarlanır)
   step2Components.doors = createRadioGroup({
     container: document.querySelector('[data-component="doors"]'),
     options: [
@@ -447,7 +488,7 @@ function initStep2() {
       { value: '5', label: '5' }
     ],
     value: state.doors,
-    onChange: (v) => { state.doors = v; updateNextButton(); }
+    onChange: (v) => { state.doors = v; }
   });
 
   // Ağır hasar
@@ -459,26 +500,16 @@ function initStep2() {
   });
 }
 
-function isStep2Valid() {
-  return state.purchasePrice !== null && state.purchasePrice > 0 &&
-         state.year &&
-         state.km !== null && state.km >= 0 &&
-         state.transmission &&
-         state.fuel &&
-         state.bodyType &&
-         state.enginePower &&
-         state.drive &&
-         state.doors;
-}
-
 // ============================================================
 // İLERİ / GERİ
 // ============================================================
 function updateNextButton() {
   if (state.step === 1) {
+    // Step 1: marka + model zorunlu, seri opsiyonel
     nextBtn.disabled = !(state.selectedBrand && state.selectedModel);
   } else if (state.step === 2) {
-    nextBtn.disabled = !isStep2Valid();
+    // Step 2: tüm alanlar opsiyonel, her zaman ilerleyebilir
+    nextBtn.disabled = false;
   }
 }
 
@@ -487,21 +518,25 @@ function handleNext() {
     if (!state.selectedBrand || !state.selectedModel) return;
     showStep(2);
   } else if (state.step === 2) {
-    if (!isStep2Valid()) return;
     // Faz 5'te buradan hasar şemasına geçeceğiz
+    const fmt = (v) => (v === null || v === undefined || v === '') ? '(boş)' : v;
+    const enginePowerDisplay = state.enginePower === 'custom'
+      ? (state.customEnginePower ? `${state.customEnginePower} HP (tam değer)` : '(boş - tam değer girilmedi)')
+      : fmt(state.enginePower);
+
     const summary = `
-Marka: ${state.selectedBrand}
-Model: ${state.selectedModel}
-Seri: ${state.selectedSeries || '(yok)'}
-Alış fiyatı: ${state.purchasePrice.toLocaleString('tr-TR')} ₺
+Marka: ${fmt(state.selectedBrand)}
+Model: ${fmt(state.selectedModel)}
+Seri: ${fmt(state.selectedSeries)}
+Alış fiyatı: ${state.purchasePrice ? state.purchasePrice.toLocaleString('tr-TR') + ' ₺' : '(boş)'}
 Yıl: ${state.year}
-KM: ${state.km.toLocaleString('tr-TR')}
-Vites: ${state.transmission}
-Yakıt: ${state.fuel}
-Kasa: ${state.bodyType}
-Motor: ${state.enginePower}
-Çekiş: ${state.drive}
-Kapı: ${state.doors}
+KM: ${state.km !== null ? state.km.toLocaleString('tr-TR') + ' km' : '(boş)'}
+Vites: ${fmt(state.transmission)}
+Yakıt: ${fmt(state.fuel)}
+Kasa: ${fmt(state.bodyType)}
+Motor: ${enginePowerDisplay}
+Çekiş: ${fmt(state.drive)}
+Kapı: ${fmt(state.doors)}
 Hasar kayıt: ${state.heavyDamage ? 'Evet' : 'Hayır'}
     `.trim();
     alert('✓ Bilgiler alındı:\n\n' + summary + '\n\nFaz 5\'te hasar şeması + kaydet butonu gelecek.');
