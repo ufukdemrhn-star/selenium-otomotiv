@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <title>Selenium Otomotiv</title>
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 
@@ -30,16 +30,13 @@
       <form id="login-form" class="login-form" novalidate>
         <div class="input-group">
           <label for="username">Kullanıcı Adı</label>
-          <input type="text" id="username" name="username"
-            autocomplete="username" autocapitalize="none"
-            spellcheck="false" required>
+          <input type="text" id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
         </div>
 
         <div class="input-group">
           <label for="password">Şifre</label>
           <div class="password-wrapper">
-            <input type="password" id="password" name="password"
-              autocomplete="current-password" required>
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
             <button type="button" id="toggle-password" class="toggle-password" aria-label="Şifreyi göster">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -57,7 +54,7 @@
         </button>
       </form>
 
-      <div class="login-footer">v0.5 — Faz 4</div>
+      <div class="login-footer">v0.6 — Faz 5</div>
     </div>
   </div>
 
@@ -84,9 +81,9 @@
           <div class="welcome-name" id="welcome-name">—</div>
         </div>
         <div class="info-card">
-          <div class="info-card-title">Faz 4 Tamamlandı ✓</div>
+          <div class="info-card-title">Faz 5 Tamamlandı ✓</div>
           <div class="info-card-text">
-            Araç bilgileri formu hazır. Faz 5'te hasar şeması (tıklanabilir araç parçaları) + kaydetme gelecek.
+            Hasar şeması, kaydetme ve araç listesi hazır. Faz 6'da araç detay sayfası + foto yükleme + 5-açılı süslü görsel gelecek.
           </div>
         </div>
         <div class="placeholder-stats">
@@ -101,12 +98,34 @@
       <section id="tab-vehicles" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">Araçlar</h1>
-          <button id="add-vehicle-btn" class="add-btn" aria-label="Yeni araç ekle">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
+          <div class="page-actions">
+            <div class="view-toggle">
+              <button class="view-toggle-btn" data-view="list" aria-label="Liste görünümü" title="Liste">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+              </button>
+              <button class="view-toggle-btn" data-view="gallery" aria-label="Galeri görünümü" title="Galeri">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                </svg>
+              </button>
+            </div>
+            <button id="add-vehicle-btn" class="add-btn" aria-label="Yeni araç ekle">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="sub-tabs">
           <button class="sub-tab active" data-subtab="active">Aktif</button>
@@ -115,20 +134,14 @@
         </div>
         <div class="sub-tab-content" id="subtab-active">
           <div class="empty-state">
-            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 17h10M5 17l2-7h10l2 7M5 17v3M19 17v3"/>
-              <circle cx="8" cy="17" r="1"/>
-              <circle cx="16" cy="17" r="1"/>
-            </svg>
-            <p class="empty-title">Henüz araç yok</p>
-            <p class="empty-hint">+ butonuna basıp ilk aracını ekle</p>
+            <p class="empty-title">Yükleniyor...</p>
           </div>
         </div>
         <div class="sub-tab-content" id="subtab-sold" hidden>
-          <div class="empty-state"><p class="empty-title">Satılan araç yok</p></div>
+          <div class="empty-state"><p class="empty-title">Yükleniyor...</p></div>
         </div>
         <div class="sub-tab-content" id="subtab-deleted" hidden>
-          <div class="empty-state"><p class="empty-title">Silinen araç yok</p></div>
+          <div class="empty-state"><p class="empty-title">Yükleniyor...</p></div>
         </div>
       </section>
 
@@ -138,7 +151,6 @@
           <div class="construction-icon">🔨</div>
           <h2 class="construction-title">İhale Hesaplayıcı</h2>
           <p class="construction-text">Yapım aşamasında</p>
-          <p class="construction-hint">İhalede vereceğin teklifin ne kadar mantıklı olduğunu hızlıca hesaplayacağın araç. İleride.</p>
         </div>
       </section>
 
@@ -148,12 +160,10 @@
           <div class="construction-icon">⚙️</div>
           <h2 class="construction-title">Profil & Ayarlar</h2>
           <p class="construction-text">Yapım aşamasında</p>
-          <p class="construction-hint">Tema ayarları, kara tahta (notlaşma alanı) ve çıkış burada olacak.</p>
         </div>
       </section>
     </main>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <button class="nav-item active" data-tab="home">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -217,7 +227,6 @@
         <h2 class="wizard-section-title">Araç Seçimi</h2>
         <p class="wizard-section-desc">Marka ve modeli seç. Seri opsiyoneldir.</p>
 
-        <!-- MARKA -->
         <div class="search-block">
           <label class="search-label">MARKA</label>
           <div id="brand-search-container" class="searchable-list"></div>
@@ -235,7 +244,6 @@
           </div>
         </div>
 
-        <!-- MODEL -->
         <div class="search-block" id="model-block" hidden>
           <label class="search-label">MODEL</label>
           <div id="model-search-container" class="searchable-list"></div>
@@ -253,7 +261,6 @@
           </div>
         </div>
 
-        <!-- SERİ -->
         <div class="search-block" id="series-block" hidden>
           <label class="search-label">SERİ <span class="optional">opsiyonel</span></label>
           <div id="series-search-container" class="searchable-list"></div>
@@ -332,6 +339,19 @@
           <div data-component="heavy-damage"></div>
         </div>
       </section>
+
+      <!-- ===== STEP 3: HASAR ŞEMASI ===== -->
+      <section class="wizard-step-content" data-step="3" id="step-3">
+        <h2 class="wizard-section-title">Hasar Şeması</h2>
+        <p class="wizard-section-desc">Parçaya tıkla → durum değişir. Boş bırakılan parçalar orijinal sayılır.</p>
+
+        <div id="step3-summary" class="step-summary">
+          <div class="summary-label">ARAÇ</div>
+          <div class="summary-value">—</div>
+        </div>
+
+        <div data-component="damage-diagram"></div>
+      </section>
     </main>
 
     <footer class="wizard-footer">
@@ -352,6 +372,6 @@
     </footer>
   </div>
 
-  <script type="module" src="js/app.js?v=8"></script>
+  <script type="module" src="js/app.js?v=9"></script>
 </body>
 </html>
