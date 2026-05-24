@@ -1,8 +1,8 @@
 // ============================================================
-// wizard.js — Yeni araç ekleme wizard'ı (FAZ 4 v8)
-// Step 1: marka/model/seri | Step 2: araç bilgileri (opsiyonel)
+// wizard.js — Yeni araç ekleme wizard'ı (FAZ 5 v9)
+// Step 1: marka/model/seri | Step 2: bilgiler | Step 3: hasar + kaydet
 // ============================================================
-console.log('🧙 wizard.js v8 yüklendi (opsiyonel alanlar + diğer HP + otomatik kapı)');
+console.log('🧙 wizard.js v9 yüklendi (Faz 5: hasar şeması + kaydet)');
 
 import {
   getAllBrands,
@@ -11,8 +11,8 @@ import {
   addSeries,
   getModelsForBrand,
   getSeriesForModel
-} from "./brands-db.js?v=8";
-import { createSearchableList } from "./vehicle-search.js?v=8";
+} from "./brands-db.js?v=9";
+import { createSearchableList } from "./vehicle-search.js?v=9";
 import {
   createYearWheel,
   createSegmented,
@@ -20,7 +20,9 @@ import {
   createNumberInput,
   createRadioGroup,
   createToggle
-} from "./form-components.js?v=8";
+} from "./form-components.js?v=9";
+import { createDamageDiagram } from "./damage-diagram.js?v=9";
+import { addVehicle } from "./vehicles-db.js?v=9";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
@@ -28,31 +30,28 @@ const nextBtn = document.getElementById('wizard-next');
 const prevBtn = document.getElementById('wizard-prev');
 const stepNumEl = document.querySelector('.wizard-step-indicator .step-num');
 
-// ============================================================
-// STATE
-// ============================================================
 const initialState = () => ({
   isOpen: false,
   step: 1,
   brands: {},
 
-  // Step 1
   selectedBrand: null,
   selectedModel: null,
   selectedSeries: null,
 
-  // Step 2 (hepsi opsiyonel)
   purchasePrice: null,
   year: 2010,
   km: null,
   transmission: null,
   fuel: null,
   bodyType: null,
-  enginePower: null,         // kategori veya 'custom'
-  customEnginePower: null,   // 'custom' seçildiğinde tam sayı
+  enginePower: null,
+  customEnginePower: null,
   drive: null,
   doors: null,
-  heavyDamage: false
+  heavyDamage: false,
+
+  damage: {} // Step 3
 });
 
 let state = initialState();
@@ -61,10 +60,8 @@ let brandSearch = null;
 let modelSearch = null;
 let seriesSearch = null;
 let step2Components = {};
+let damageComponent = null;
 
-// ============================================================
-// FORM SEÇENEKLERİ
-// ============================================================
 const FUEL_OPTIONS = [
   { value: 'benzinli', label: 'Benzinli' },
   { value: 'benzin_lpg', label: 'Benzin & LPG' },
@@ -85,7 +82,6 @@ const BODY_OPTIONS = [
   { value: 'sedan', label: 'Sedan' }
 ];
 
-// Kasa tipi → otomatik kapı sayısı eşlemesi
 const BODY_TO_DOORS = {
   'hatchback_3': '3',
   'hatchback_5': '5',
@@ -130,6 +126,7 @@ export async function openWizard() {
   document.body.style.overflow = 'hidden';
 
   resetStep2DOM();
+  resetStep3DOM();
   showStep(1);
 
   const loadingEl = document.getElementById('wizard-loading');
@@ -148,7 +145,8 @@ export async function openWizard() {
 
 function hasAnyData() {
   return state.selectedBrand || state.purchasePrice || state.km || state.transmission ||
-         state.fuel || state.bodyType || state.enginePower || state.drive || state.doors;
+         state.fuel || state.bodyType || state.enginePower || state.drive || state.doors ||
+         Object.keys(state.damage).length > 0;
 }
 
 function closeWizard(skipConfirm = false) {
@@ -161,6 +159,7 @@ function closeWizard(skipConfirm = false) {
   document.body.style.overflow = '';
 
   step2Components = {};
+  damageComponent = null;
   resetStep1DOM();
   state = initialState();
 }
@@ -185,6 +184,11 @@ function resetStep2DOM() {
   if (customBlock) customBlock.hidden = true;
 }
 
+function resetStep3DOM() {
+  const container = document.querySelector('[data-component="damage-diagram"]');
+  if (container) container.innerHTML = '';
+}
+
 // ============================================================
 // ADIM YÖNETİMİ
 // ============================================================
@@ -206,7 +210,10 @@ function showStep(n) {
     }
     updateNextButton();
   } else if (n === 3) {
-    nextBtn.querySelector('.btn-text').textContent = 'Kaydet';
+    nextBtn.querySelector('.btn-text').textContent = '✓ Kaydet';
+    if (!damageComponent) {
+      initStep3();
+    }
     updateNextButton();
   }
 
@@ -214,7 +221,7 @@ function showStep(n) {
 }
 
 // ============================================================
-// STEP 1 — MARKA / MODEL / SERİ
+// STEP 1
 // ============================================================
 function initBrandSearch() {
   const container = document.getElementById('brand-search-container');
@@ -232,14 +239,11 @@ function selectBrand(brandName) {
   state.selectedBrand = brandName;
   state.selectedModel = null;
   state.selectedSeries = null;
-
   const pill = document.getElementById('selected-brand');
   pill.hidden = false;
   pill.querySelector('.pill-text').textContent = brandName;
   document.getElementById('brand-search-container').hidden = true;
-
   initModelSearch();
-
   document.getElementById('selected-model').hidden = true;
   document.getElementById('selected-series').hidden = true;
   document.getElementById('series-block').hidden = true;
@@ -362,43 +366,32 @@ async function addNewSeries(seriesName) {
 }
 
 // ============================================================
-// STEP 2 — ARAÇ BİLGİLERİ (HEPSİ OPSİYONEL)
+// STEP 2
 // ============================================================
 function initStep2() {
-  // Özet kartı
   const summaryEl = document.getElementById('step2-summary');
   const summaryText = [state.selectedBrand, state.selectedModel, state.selectedSeries]
     .filter(Boolean).join(' · ');
   summaryEl.querySelector('.summary-value').textContent = summaryText;
 
-  // Alış fiyatı
   step2Components.purchasePrice = createNumberInput({
     container: document.querySelector('[data-component="purchase-price"]'),
-    placeholder: '0',
-    suffix: '₺',
-    value: state.purchasePrice,
+    placeholder: '0', suffix: '₺', value: state.purchasePrice,
     onChange: (v) => { state.purchasePrice = v; }
   });
 
-  // Yıl wheel
   step2Components.year = createYearWheel({
     container: document.querySelector('[data-component="year"]'),
-    min: 1980,
-    max: 2026,
-    value: state.year,
+    min: 1980, max: 2026, value: state.year,
     onChange: (v) => { state.year = v; }
   });
 
-  // KM
   step2Components.km = createNumberInput({
     container: document.querySelector('[data-component="km"]'),
-    placeholder: '0',
-    suffix: 'km',
-    value: state.km,
+    placeholder: '0', suffix: 'km', value: state.km,
     onChange: (v) => { state.km = v; }
   });
 
-  // Vites
   step2Components.transmission = createSegmented({
     container: document.querySelector('[data-component="transmission"]'),
     options: [
@@ -409,52 +402,37 @@ function initStep2() {
     onChange: (v) => { state.transmission = v; }
   });
 
-  // Yakıt
   step2Components.fuel = createDropdown({
     container: document.querySelector('[data-component="fuel"]'),
-    options: FUEL_OPTIONS,
-    placeholder: 'Yakıt tipi seç',
-    value: state.fuel,
+    options: FUEL_OPTIONS, placeholder: 'Yakıt tipi seç', value: state.fuel,
     onChange: (v) => { state.fuel = v; }
   });
 
-  // Kasa tipi — seçilince kapı sayısını da otomatik ayarla
   step2Components.bodyType = createDropdown({
     container: document.querySelector('[data-component="body-type"]'),
-    options: BODY_OPTIONS,
-    placeholder: 'Kasa tipi seç',
-    value: state.bodyType,
+    options: BODY_OPTIONS, placeholder: 'Kasa tipi seç', value: state.bodyType,
     onChange: (v) => {
       state.bodyType = v;
-      // Otomatik kapı seçimi
       if (BODY_TO_DOORS[v]) {
         state.doors = BODY_TO_DOORS[v];
-        if (step2Components.doors) {
-          step2Components.doors.setValue(BODY_TO_DOORS[v]);
-        }
+        if (step2Components.doors) step2Components.doors.setValue(BODY_TO_DOORS[v]);
       }
     }
   });
 
-  // Motor gücü — "Diğer" seçilirse custom input açılır
   const customEngineBlock = document.querySelector('[data-component="custom-engine-power"]');
   step2Components.enginePower = createDropdown({
     container: document.querySelector('[data-component="engine-power"]'),
-    options: ENGINE_POWER_OPTIONS,
-    placeholder: 'Motor gücü seç',
-    value: state.enginePower,
+    options: ENGINE_POWER_OPTIONS, placeholder: 'Motor gücü seç', value: state.enginePower,
     onChange: (v) => {
       state.enginePower = v;
       if (v === 'custom') {
-        // Custom HP input'unu göster ve oluştur (yoksa)
         customEngineBlock.hidden = false;
         if (!step2Components.customEnginePower) {
           step2Components.customEnginePower = createNumberInput({
             container: customEngineBlock,
             placeholder: 'Tam HP değeri (örn. 156)',
-            suffix: 'HP',
-            value: state.customEnginePower,
-            maxLength: 4,
+            suffix: 'HP', value: state.customEnginePower, maxLength: 4,
             onChange: (val) => { state.customEnginePower = val; }
           });
           setTimeout(() => {
@@ -469,29 +447,19 @@ function initStep2() {
     }
   });
 
-  // Çekiş
   step2Components.drive = createDropdown({
     container: document.querySelector('[data-component="drive"]'),
-    options: DRIVE_OPTIONS,
-    placeholder: 'Çekiş tipi seç',
-    value: state.drive,
+    options: DRIVE_OPTIONS, placeholder: 'Çekiş tipi seç', value: state.drive,
     onChange: (v) => { state.drive = v; }
   });
 
-  // Kapı sayısı (manuel değiştirilebilir, kasa tipinden otomatik ayarlanır)
   step2Components.doors = createRadioGroup({
     container: document.querySelector('[data-component="doors"]'),
-    options: [
-      { value: '2', label: '2' },
-      { value: '3', label: '3' },
-      { value: '4', label: '4' },
-      { value: '5', label: '5' }
-    ],
+    options: [{value:'2',label:'2'},{value:'3',label:'3'},{value:'4',label:'4'},{value:'5',label:'5'}],
     value: state.doors,
     onChange: (v) => { state.doors = v; }
   });
 
-  // Ağır hasar
   step2Components.heavyDamage = createToggle({
     container: document.querySelector('[data-component="heavy-damage"]'),
     value: state.heavyDamage,
@@ -501,57 +469,82 @@ function initStep2() {
 }
 
 // ============================================================
-// İLERİ / GERİ
+// STEP 3 — HASAR ŞEMASI
+// ============================================================
+function initStep3() {
+  const summaryEl = document.getElementById('step3-summary');
+  if (summaryEl) {
+    const summaryText = [state.selectedBrand, state.selectedModel, state.selectedSeries]
+      .filter(Boolean).join(' · ');
+    summaryEl.querySelector('.summary-value').textContent = summaryText;
+  }
+
+  damageComponent = createDamageDiagram({
+    container: document.querySelector('[data-component="damage-diagram"]'),
+    initialData: state.damage,
+    onChange: (data) => { state.damage = data; }
+  });
+}
+
+// ============================================================
+// İLERİ / GERİ / KAYDET
 // ============================================================
 function updateNextButton() {
   if (state.step === 1) {
-    // Step 1: marka + model zorunlu, seri opsiyonel
     nextBtn.disabled = !(state.selectedBrand && state.selectedModel);
-  } else if (state.step === 2) {
-    // Step 2: tüm alanlar opsiyonel, her zaman ilerleyebilir
+  } else {
     nextBtn.disabled = false;
   }
 }
 
-function handleNext() {
+async function handleNext() {
   if (state.step === 1) {
     if (!state.selectedBrand || !state.selectedModel) return;
     showStep(2);
   } else if (state.step === 2) {
-    // Faz 5'te buradan hasar şemasına geçeceğiz
-    const fmt = (v) => (v === null || v === undefined || v === '') ? '(boş)' : v;
-    const enginePowerDisplay = state.enginePower === 'custom'
-      ? (state.customEnginePower ? `${state.customEnginePower} HP (tam değer)` : '(boş - tam değer girilmedi)')
-      : fmt(state.enginePower);
-
-    const summary = `
-Marka: ${fmt(state.selectedBrand)}
-Model: ${fmt(state.selectedModel)}
-Seri: ${fmt(state.selectedSeries)}
-Alış fiyatı: ${state.purchasePrice ? state.purchasePrice.toLocaleString('tr-TR') + ' ₺' : '(boş)'}
-Yıl: ${state.year}
-KM: ${state.km !== null ? state.km.toLocaleString('tr-TR') + ' km' : '(boş)'}
-Vites: ${fmt(state.transmission)}
-Yakıt: ${fmt(state.fuel)}
-Kasa: ${fmt(state.bodyType)}
-Motor: ${enginePowerDisplay}
-Çekiş: ${fmt(state.drive)}
-Kapı: ${fmt(state.doors)}
-Hasar kayıt: ${state.heavyDamage ? 'Evet' : 'Hayır'}
-    `.trim();
-    alert('✓ Bilgiler alındı:\n\n' + summary + '\n\nFaz 5\'te hasar şeması + kaydet butonu gelecek.');
+    showStep(3);
+  } else if (state.step === 3) {
+    await saveVehicle();
   }
+}
+
+async function saveVehicle() {
+  nextBtn.disabled = true;
+  nextBtn.querySelector('.btn-text').textContent = 'Kaydediliyor...';
+
+  try {
+    const id = await addVehicle(state);
+    // Başarılı — wizard'ı kapat (onay sormadan, kaydedildi çünkü)
+    state.isOpen = true; // hasAnyData kontrolünü atla
+    closeWizard(true);
+    showToast('✓ Araç başarıyla eklendi');
+  } catch (err) {
+    console.error('Kaydetme hatası:', err);
+    nextBtn.disabled = false;
+    nextBtn.querySelector('.btn-text').textContent = '✓ Kaydet';
+    alert('Kaydetme başarısız: ' + err.message);
+  }
+}
+
+function showToast(message) {
+  let toast = document.getElementById('app-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.className = 'app-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function handlePrev() {
-  if (state.step === 2) {
-    showStep(1);
-  }
+  if (state.step === 2) showStep(1);
+  else if (state.step === 3) showStep(2);
 }
 
-// ============================================================
 // EVENT LISTENERS
-// ============================================================
 closeBtn.addEventListener('click', () => closeWizard());
 nextBtn.addEventListener('click', handleNext);
 prevBtn.addEventListener('click', handlePrev);
