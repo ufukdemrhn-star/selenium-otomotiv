@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <title>Selenium Otomotiv</title>
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 
@@ -57,11 +57,11 @@
         </button>
       </form>
 
-      <div class="login-footer">v0.3 — Faz 2</div>
+      <div class="login-footer">v0.4 — Faz 3.B</div>
     </div>
   </div>
 
-  <!-- HOME (4 sekmeli ana yapı) -->
+  <!-- HOME -->
   <div id="home-screen" class="screen">
     <header class="app-header">
       <div class="header-title">
@@ -77,38 +77,23 @@
     </header>
 
     <main class="tab-content-wrapper">
-
       <!-- TAB 1: ANA SAYFA -->
       <section id="tab-home" class="tab-content active">
         <div class="welcome-box">
           <div class="welcome-label">Hoşgeldin,</div>
           <div class="welcome-name" id="welcome-name">—</div>
         </div>
-
         <div class="info-card">
-          <div class="info-card-title">Faz 2 Tamamlandı ✓</div>
+          <div class="info-card-title">Faz 3.B Tamamlandı ✓</div>
           <div class="info-card-text">
-            Alt menü çubuğu hazır. Faz 3'te araç ekleme akışı (marka/model arama, form, hasar şeması) gelecek.
+            Araç ekleme wizard'ı + marka/model arama hazır. Faz 4'te araç bilgileri formu (yıl, KM, vites, yakıt vs.) eklenecek.
           </div>
         </div>
-
         <div class="placeholder-stats">
-          <div class="stat-card">
-            <div class="stat-label">Aktif Araç</div>
-            <div class="stat-value">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Toplam Kar</div>
-            <div class="stat-value">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Satılan</div>
-            <div class="stat-value">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Toplam Masraf</div>
-            <div class="stat-value">—</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">Aktif Araç</div><div class="stat-value">—</div></div>
+          <div class="stat-card"><div class="stat-label">Toplam Kar</div><div class="stat-value">—</div></div>
+          <div class="stat-card"><div class="stat-label">Satılan</div><div class="stat-value">—</div></div>
+          <div class="stat-card"><div class="stat-label">Toplam Masraf</div><div class="stat-value">—</div></div>
         </div>
       </section>
 
@@ -123,13 +108,11 @@
             </svg>
           </button>
         </div>
-
         <div class="sub-tabs">
           <button class="sub-tab active" data-subtab="active">Aktif</button>
           <button class="sub-tab" data-subtab="sold">Satılanlar</button>
           <button class="sub-tab" data-subtab="deleted">Silinenler</button>
         </div>
-
         <div class="sub-tab-content" id="subtab-active">
           <div class="empty-state">
             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -138,20 +121,14 @@
               <circle cx="16" cy="17" r="1"/>
             </svg>
             <p class="empty-title">Henüz araç yok</p>
-            <p class="empty-hint">Faz 3'te araç ekleyebileceksin</p>
+            <p class="empty-hint">+ butonuna basıp ilk aracını ekle</p>
           </div>
         </div>
-
         <div class="sub-tab-content" id="subtab-sold" hidden>
-          <div class="empty-state">
-            <p class="empty-title">Satılan araç yok</p>
-          </div>
+          <div class="empty-state"><p class="empty-title">Satılan araç yok</p></div>
         </div>
-
         <div class="sub-tab-content" id="subtab-deleted" hidden>
-          <div class="empty-state">
-            <p class="empty-title">Silinen araç yok</p>
-          </div>
+          <div class="empty-state"><p class="empty-title">Silinen araç yok</p></div>
         </div>
       </section>
 
@@ -174,7 +151,6 @@
           <p class="construction-hint">Tema ayarları, kara tahta (notlaşma alanı) ve çıkış burada olacak.</p>
         </div>
       </section>
-
     </main>
 
     <!-- BOTTOM NAV -->
@@ -213,6 +189,95 @@
     </nav>
   </div>
 
-  <script type="module" src="js/app.js?v=3"></script>
+  <!-- ============================================ -->
+  <!-- ARAÇ EKLEME WIZARD                            -->
+  <!-- ============================================ -->
+  <div id="add-vehicle-wizard" class="wizard">
+    <header class="wizard-header">
+      <button class="wizard-close" id="wizard-close" aria-label="Kapat">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="wizard-title">Yeni Araç Ekle</div>
+      <div class="wizard-step-indicator">
+        <span class="step-num">1</span><span class="step-divider">/</span><span class="step-total">3</span>
+      </div>
+    </header>
+
+    <main class="wizard-body">
+      <div id="wizard-loading" class="wizard-loading" hidden>
+        <div class="loader"></div>
+        <div>Markalar yükleniyor...</div>
+      </div>
+
+      <section class="wizard-step-content active" data-step="1">
+        <h2 class="wizard-section-title">Araç Seçimi</h2>
+        <p class="wizard-section-desc">Marka ve modeli seç. Seri opsiyoneldir.</p>
+
+        <!-- MARKA -->
+        <div class="search-block">
+          <label class="search-label">MARKA</label>
+          <div id="brand-search-container" class="searchable-list"></div>
+          <div id="selected-brand" class="selected-pill" hidden>
+            <svg class="pill-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="pill-text"></span>
+            <button class="pill-clear" aria-label="Değiştir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- MODEL -->
+        <div class="search-block" id="model-block" hidden>
+          <label class="search-label">MODEL</label>
+          <div id="model-search-container" class="searchable-list"></div>
+          <div id="selected-model" class="selected-pill" hidden>
+            <svg class="pill-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="pill-text"></span>
+            <button class="pill-clear" aria-label="Değiştir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- SERİ -->
+        <div class="search-block" id="series-block" hidden>
+          <label class="search-label">SERİ <span class="optional">opsiyonel</span></label>
+          <div id="series-search-container" class="searchable-list"></div>
+          <div id="selected-series" class="selected-pill" hidden>
+            <svg class="pill-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="pill-text"></span>
+            <button class="pill-clear" aria-label="Değiştir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wizard-footer">
+      <button class="wizard-secondary" id="wizard-prev" hidden>← Geri</button>
+      <button class="wizard-primary" id="wizard-next" disabled>İleri →</button>
+    </footer>
+  </div>
+
+  <script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>
