@@ -1,12 +1,8 @@
 // ============================================================
-// damage-diagram.js — Hasar şeması komponenti
-// SVG araç şeması + parça listesi (senkronize)
-// Her parça için durum: null (orjinal) | 'L' | 'B' | 'D'
+// damage-diagram.js — Hasar şeması (v10: gerçekçi SVG araç şeması)
+// Üstten görünüm + sağ/sol yan kapılar açılmış + tekerlekler + camlar
 // ============================================================
 
-// 13 parça (ID, görünen ad, SVG path)
-// SVG koordinat sistemi: 320x460 viewBox
-// Düzen: üstten görünüm + sağ/sol yanda tekerlekler ile yan profil
 export const PARTS = [
   { id: 'on_tampon',         label: 'Ön Tampon' },
   { id: 'motor_kaputu',      label: 'Motor Kaputu' },
@@ -23,81 +19,62 @@ export const PARTS = [
   { id: 'arka_tampon',       label: 'Arka Tampon' }
 ];
 
-// Sıralı döngü
-const NEXT_STATUS = {
-  null: 'L',
-  'L':  'B',
-  'B':  'D',
-  'D':  null
-};
+const NEXT_STATUS = { null: 'L', 'L': 'B', 'B': 'D', 'D': null };
 
-const STATUS_LABELS = {
-  'L': 'Lokal Boyalı',
-  'B': 'Boyalı',
-  'D': 'Değişen'
-};
-
-const STATUS_LETTERS = {
-  'L': 'L',
-  'B': 'B',
-  'D': 'D'
-};
-
-// SVG part path'leri — üstten görünüm car schematic
-// 320px geniş, 460px yüksek
+// SVG koordinat sistemi: 400x560 viewBox
 const PART_PATHS = {
-  // Ön tampon (üst)
-  on_tampon: 'M 105 12 L 215 12 L 222 28 L 98 28 Z',
-  // Motor kaputu
-  motor_kaputu: 'M 100 36 L 220 36 L 222 95 L 98 95 Z',
-  // Tavan (orta)
-  tavan: 'M 110 145 L 210 145 L 210 245 L 110 245 Z',
-  // Bagaj kapağı
-  bagaj_kapagi: 'M 100 380 L 220 380 L 222 420 L 98 420 Z',
-  // Arka tampon
-  arka_tampon: 'M 105 432 L 215 432 L 222 448 L 98 448 Z',
-  // Sağ ön çamurluk (üst sağ)
-  sag_on_camurluk: 'M 224 36 L 268 50 L 268 95 L 224 95 Z',
-  // Sağ ön kapı
-  sag_on_kapi: 'M 224 102 L 268 102 L 268 200 L 224 200 Z',
-  // Sağ arka kapı
-  sag_arka_kapi: 'M 224 208 L 268 208 L 268 310 L 224 310 Z',
-  // Sağ arka çamurluk
-  sag_arka_camurluk: 'M 224 318 L 268 318 L 268 380 L 224 380 Z',
-  // Sol ön çamurluk
-  sol_on_camurluk: 'M 52 50 L 96 36 L 96 95 L 52 95 Z',
-  // Sol ön kapı
-  sol_on_kapi: 'M 52 102 L 96 102 L 96 200 L 52 200 Z',
-  // Sol arka kapı
-  sol_arka_kapi: 'M 52 208 L 96 208 L 96 310 L 52 310 Z',
-  // Sol arka çamurluk
-  sol_arka_camurluk: 'M 52 318 L 96 318 L 96 380 L 52 380 Z'
+  // ÜSTTEN GÖRÜNÜM (ortada, kavisli)
+  on_tampon:
+    'M 140 30 Q 150 18 200 18 Q 250 18 260 30 L 268 52 L 132 52 Z',
+  motor_kaputu:
+    'M 130 58 L 270 58 Q 280 80 280 130 L 120 130 Q 120 80 130 58 Z',
+  tavan:
+    'M 145 170 L 255 170 L 255 360 L 145 360 Z',
+  bagaj_kapagi:
+    'M 120 400 L 280 400 Q 280 450 270 472 L 130 472 Q 120 450 120 400 Z',
+  arka_tampon:
+    'M 132 478 L 268 478 L 260 500 Q 250 512 200 512 Q 150 512 140 500 Z',
+
+  // SAĞ YAN — kapılar açılmış gibi yan profilde
+  sag_on_camurluk:
+    'M 285 75 Q 320 60 350 80 L 360 130 L 285 130 Z',
+  sag_on_kapi:
+    'M 285 135 L 345 135 L 345 255 L 285 255 Z',
+  sag_arka_kapi:
+    'M 285 260 L 345 260 L 345 380 L 285 380 Z',
+  sag_arka_camurluk:
+    'M 285 385 L 360 385 L 350 435 Q 320 455 285 440 Z',
+
+  // SOL YAN (sağın aynası)
+  sol_on_camurluk:
+    'M 50 80 Q 80 60 115 75 L 115 130 L 40 130 Z',
+  sol_on_kapi:
+    'M 55 135 L 115 135 L 115 255 L 55 255 Z',
+  sol_arka_kapi:
+    'M 55 260 L 115 260 L 115 380 L 55 380 Z',
+  sol_arka_camurluk:
+    'M 40 385 L 115 385 L 115 440 Q 80 455 50 435 Z'
 };
 
-// Parçanın merkezi (etiket için)
+// Parçanın etiket merkezi
 const PART_CENTERS = {
-  on_tampon:          { x: 160, y: 20 },
-  motor_kaputu:       { x: 160, y: 65 },
-  tavan:              { x: 160, y: 195 },
-  bagaj_kapagi:       { x: 160, y: 400 },
-  arka_tampon:        { x: 160, y: 440 },
-  sag_on_camurluk:    { x: 246, y: 70 },
-  sag_on_kapi:        { x: 246, y: 151 },
-  sag_arka_kapi:      { x: 246, y: 259 },
-  sag_arka_camurluk:  { x: 246, y: 349 },
-  sol_on_camurluk:    { x: 74, y: 70 },
-  sol_on_kapi:        { x: 74, y: 151 },
-  sol_arka_kapi:      { x: 74, y: 259 },
-  sol_arka_camurluk:  { x: 74, y: 349 }
+  on_tampon:          { x: 200, y: 38 },
+  motor_kaputu:       { x: 200, y: 94 },
+  tavan:              { x: 200, y: 265 },
+  bagaj_kapagi:       { x: 200, y: 436 },
+  arka_tampon:        { x: 200, y: 495 },
+
+  sag_on_camurluk:    { x: 320, y: 100 },
+  sag_on_kapi:        { x: 315, y: 225 },  // camın altında
+  sag_arka_kapi:      { x: 315, y: 350 },
+  sag_arka_camurluk:  { x: 320, y: 410 },
+
+  sol_on_camurluk:    { x: 80, y: 100 },
+  sol_on_kapi:        { x: 85, y: 225 },
+  sol_arka_kapi:      { x: 85, y: 350 },
+  sol_arka_camurluk:  { x: 80, y: 410 }
 };
 
-/**
- * Hasar şeması komponenti oluştur
- * options:
- *   container - render edilecek element
- *   initialData - { [partId]: status, ... } başlangıç durumu
- *   onChange - (data) => void, her değişimde çağrılır
- */
 export function createDamageDiagram({ container, initialData = {}, onChange = () => {} }) {
   let state = { ...initialData };
 
@@ -113,8 +90,7 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
   }
 
   function cycleStatus(partId) {
-    const current = getStatus(partId);
-    setStatus(partId, NEXT_STATUS[current]);
+    setStatus(partId, NEXT_STATUS[getStatus(partId)]);
   }
 
   function resetAll() {
@@ -135,34 +111,82 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
       </div>
 
       <div class="damage-svg-wrapper">
-        <svg class="damage-svg" viewBox="0 0 320 460" xmlns="http://www.w3.org/2000/svg">
-          <!-- Araç ana gövdesi konturu -->
-          <rect x="98" y="12" width="124" height="436" rx="40" fill="none" stroke="#444" stroke-width="0.5" opacity="0.3"/>
+        <svg class="damage-svg" viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg">
+          <!-- ============ TEKERLEKLER (en altta, dekoratif) ============ -->
+          <g class="wheels" pointer-events="none">
+            <!-- Sol ön -->
+            <circle cx="22" cy="100" r="20" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/>
+            <circle cx="22" cy="100" r="8" fill="#2d2d2d"/>
+            <!-- Sol arka -->
+            <circle cx="22" cy="410" r="20" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/>
+            <circle cx="22" cy="410" r="8" fill="#2d2d2d"/>
+            <!-- Sağ ön -->
+            <circle cx="378" cy="100" r="20" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/>
+            <circle cx="378" cy="100" r="8" fill="#2d2d2d"/>
+            <!-- Sağ arka -->
+            <circle cx="378" cy="410" r="20" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/>
+            <circle cx="378" cy="410" r="8" fill="#2d2d2d"/>
+          </g>
 
-          <!-- Tekerlekler (dekoratif) -->
-          <circle cx="74" cy="70" r="22" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
-          <circle cx="246" cy="70" r="22" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
-          <circle cx="74" cy="349" r="22" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
-          <circle cx="246" cy="349" r="22" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
-
-          <!-- Cam alanları (dekoratif) -->
-          <path d="M 110 100 L 210 100 L 215 140 L 105 140 Z" fill="#0d0d0d" opacity="0.6"/>
-          <path d="M 110 380 L 210 380 L 215 340 L 105 340 Z" fill="#0d0d0d" opacity="0.6"/>
-          <path d="M 110 250 L 210 250 L 210 335 L 110 335 Z" fill="#0d0d0d" opacity="0.3"/>
-
-          <!-- Parçalar - dinamik -->
+          <!-- ============ PARÇALAR (tıklanabilir) ============ -->
           ${PARTS.map(p => `
             <path
               class="damage-part"
               data-part="${p.id}"
               d="${PART_PATHS[p.id]}"
-              fill="#2a2a2a"
-              stroke="#555"
-              stroke-width="0.5"
+              fill="#3a3a3a"
+              stroke="#666"
+              stroke-width="0.8"
             />
           `).join('')}
 
-          <!-- Parça etiketleri (durum harfleri) -->
+          <!-- ============ ÜST KATMAN: CAMLAR, FARLAR (dekoratif, pointer-events: none) ============ -->
+          <g class="decorations" pointer-events="none">
+            <!-- Ön cam (motor kaputu ile tavan arasında) -->
+            <path d="M 145 138 L 255 138 L 248 165 L 152 165 Z"
+                  fill="#0a0a0a" opacity="0.85"/>
+            <!-- Tavanda cam tavan (sunroof) -->
+            <rect x="165" y="195" width="70" height="140" rx="8"
+                  fill="#0a0a0a" opacity="0.4"/>
+            <!-- Arka cam -->
+            <path d="M 152 365 L 248 365 L 255 392 L 145 392 Z"
+                  fill="#0a0a0a" opacity="0.85"/>
+
+            <!-- SAĞ kapı camları -->
+            <rect x="295" y="148" width="42" height="48" rx="3"
+                  fill="#0a0a0a" opacity="0.7"/>
+            <rect x="295" y="273" width="42" height="48" rx="3"
+                  fill="#0a0a0a" opacity="0.7"/>
+
+            <!-- SOL kapı camları -->
+            <rect x="63" y="148" width="42" height="48" rx="3"
+                  fill="#0a0a0a" opacity="0.7"/>
+            <rect x="63" y="273" width="42" height="48" rx="3"
+                  fill="#0a0a0a" opacity="0.7"/>
+
+            <!-- Kapı kolları (küçük çizgiler) -->
+            <rect x="305" y="208" width="22" height="3" rx="1.5" fill="#999" opacity="0.5"/>
+            <rect x="305" y="333" width="22" height="3" rx="1.5" fill="#999" opacity="0.5"/>
+            <rect x="73" y="208" width="22" height="3" rx="1.5" fill="#999" opacity="0.5"/>
+            <rect x="73" y="333" width="22" height="3" rx="1.5" fill="#999" opacity="0.5"/>
+
+            <!-- FARLAR (ön) -->
+            <ellipse cx="158" cy="35" rx="12" ry="5" fill="#ffd766" opacity="0.55"/>
+            <ellipse cx="242" cy="35" rx="12" ry="5" fill="#ffd766" opacity="0.55"/>
+
+            <!-- ARKA STOP LAMBALARI -->
+            <ellipse cx="158" cy="495" rx="12" ry="4" fill="#ff5566" opacity="0.55"/>
+            <ellipse cx="242" cy="495" rx="12" ry="4" fill="#ff5566" opacity="0.55"/>
+
+            <!-- Ön ızgara / amblem (dekoratif) -->
+            <rect x="190" y="42" width="20" height="6" rx="2" fill="#1a1a1a" opacity="0.5"/>
+
+            <!-- Yan ayna ipuçları -->
+            <circle cx="135" cy="100" r="3" fill="#666" opacity="0.6"/>
+            <circle cx="265" cy="100" r="3" fill="#666" opacity="0.6"/>
+          </g>
+
+          <!-- ============ DURUM HARFLERİ (en üstte) ============ -->
           ${PARTS.map(p => `
             <text
               class="damage-letter"
@@ -171,8 +195,8 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
               y="${PART_CENTERS[p.id].y + 5}"
               text-anchor="middle"
               fill="#fff"
-              font-size="14"
-              font-weight="800"
+              font-size="15"
+              font-weight="900"
               pointer-events="none"
             ></text>
           `).join('')}
@@ -196,7 +220,6 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
     </div>
   `;
 
-  // Parça yolu ve metni güncelle
   function render() {
     PARTS.forEach(p => {
       const status = getStatus(p.id);
@@ -205,32 +228,21 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
       const rowEl = container.querySelector(`.damage-row[data-part="${p.id}"]`);
       const pillEl = container.querySelector(`[data-status-pill="${p.id}"]`);
 
-      // SVG renkleri
-      let fill = '#2a2a2a'; // orijinal
-      let textColor = '#fff';
+      let fill = '#3a3a3a';
       let letter = '';
       let pillClass = 'status-pill';
       let pillText = 'Orijinal';
       let rowClass = 'damage-row';
 
       if (status === 'L') {
-        fill = '#ff8c42'; // turuncu
-        letter = 'L';
-        pillClass = 'status-pill local';
-        pillText = 'Lokal';
-        rowClass = 'damage-row local';
+        fill = '#ff8c42'; letter = 'L';
+        pillClass = 'status-pill local'; pillText = 'Lokal'; rowClass = 'damage-row local';
       } else if (status === 'B') {
-        fill = '#3498db'; // mavi
-        letter = 'B';
-        pillClass = 'status-pill painted';
-        pillText = 'Boyalı';
-        rowClass = 'damage-row painted';
+        fill = '#3498db'; letter = 'B';
+        pillClass = 'status-pill painted'; pillText = 'Boyalı'; rowClass = 'damage-row painted';
       } else if (status === 'D') {
-        fill = '#ff4757'; // kırmızı
-        letter = 'D';
-        pillClass = 'status-pill changed';
-        pillText = 'Değişen';
-        rowClass = 'damage-row changed';
+        fill = '#ff4757'; letter = 'D';
+        pillClass = 'status-pill changed'; pillText = 'Değişen'; rowClass = 'damage-row changed';
       }
 
       pathEl.setAttribute('fill', fill);
@@ -241,24 +253,16 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
     });
   }
 
-  // Event listener: SVG parça tıklaması
   container.querySelectorAll('.damage-part').forEach(el => {
-    el.addEventListener('click', () => {
-      cycleStatus(el.dataset.part);
-    });
+    el.addEventListener('click', () => cycleStatus(el.dataset.part));
   });
 
-  // Event listener: Liste satırı tıklaması
   container.querySelectorAll('.damage-row').forEach(el => {
-    el.addEventListener('click', () => {
-      cycleStatus(el.dataset.part);
-    });
+    el.addEventListener('click', () => cycleStatus(el.dataset.part));
   });
 
-  // Sıfırla butonu
   container.querySelector('.damage-reset-btn').addEventListener('click', resetAll);
 
-  // İlk render
   render();
 
   return {
