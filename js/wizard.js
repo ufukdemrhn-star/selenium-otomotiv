@@ -2,7 +2,7 @@
 // wizard.js — Yeni araç ekleme wizard'ı (FAZ 5 v9)
 // Step 1: marka/model/seri | Step 2: bilgiler | Step 3: hasar + kaydet
 // ============================================================
-console.log('🧙 wizard.js v10 yüklendi (gerçekçi şema) (Faz 5: hasar şeması + kaydet)');
+console.log('🧙 wizard.js v11 yüklendi (Faz 6.A)');
 
 import {
   getAllBrands,
@@ -11,8 +11,8 @@ import {
   addSeries,
   getModelsForBrand,
   getSeriesForModel
-} from "./brands-db.js?v=10";
-import { createSearchableList } from "./vehicle-search.js?v=10";
+} from "./brands-db.js?v=9";
+import { createSearchableList } from "./vehicle-search.js?v=9";
 import {
   createYearWheel,
   createSegmented,
@@ -20,9 +20,9 @@ import {
   createNumberInput,
   createRadioGroup,
   createToggle
-} from "./form-components.js?v=10";
-import { createDamageDiagram } from "./damage-diagram.js?v=10";
-import { addVehicle } from "./vehicles-db.js?v=10";
+} from "./form-components.js?v=9";
+import { createDamageDiagram } from "./damage-diagram.js?v=9";
+import { addVehicle } from "./vehicles-db.js?v=9";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
