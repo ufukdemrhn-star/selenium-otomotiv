@@ -1313,22 +1313,40 @@ button { font-family: inherit; }
 }
 
 /* Arkaplan filigran (default — foto yokken) */
+/* Yatay duruyor, kart boyutuna sığacak şekilde */
 .card-bg-watermark {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3.5rem;
   font-weight: 900;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.25em;
   color: var(--accent);
-  opacity: 0.08;
+  opacity: 0.07;
   pointer-events: none;
   z-index: 0;
   white-space: nowrap;
-  transform: rotate(-15deg) scale(1.5);
-  text-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
+  text-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+  user-select: none;
+}
+
+/* Liste kartında büyük filigran (kartın eninin tamamı kadar) */
+.list-card .card-bg-watermark {
+  font-size: clamp(1.8rem, 8vw, 3rem);
+}
+
+/* Galeri kartında daha küçük (kare alan dar) */
+.gallery-card .card-bg-watermark {
+  font-size: clamp(0.9rem, 4.5vw, 1.6rem);
+  letter-spacing: 0.15em;
+}
+
+@media (min-width: 900px) {
+  .gallery-card .card-bg-watermark {
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+  }
 }
 
 .card-content {
@@ -1435,4 +1453,40 @@ button { font-family: inherit; }
 .app-toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+
+/* ============================================ */
+/* LİSTE KART — Alış + Masraf satırı            */
+/* ============================================ */
+.card-price-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.card-price-line .price-label {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.card-price-line .price-value {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.card-price-line .price-sep {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.card-price-line .price-muted {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
