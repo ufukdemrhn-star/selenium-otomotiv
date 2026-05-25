@@ -1,7 +1,7 @@
 // ============================================================
 // vehicles-db.js — Firestore araç işlemleri
 // ============================================================
-import { db, auth } from "./firebase.js?v=9";
+import { db, auth } from "./firebase.js?v=10";
 import {
   collection,
   doc,
