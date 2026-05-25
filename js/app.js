@@ -1,5 +1,5 @@
 // ============================================================
-// FAZ 5 — Ana uygulama + wizard + araç listesi
+// FAZ 5 — Ana uygulama + wizard + araç listesi.
 // ============================================================
 import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=10";
 import { openWizard } from "./wizard.js?v=10";
