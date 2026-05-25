@@ -1313,7 +1313,6 @@ button { font-family: inherit; }
 }
 
 /* Arkaplan filigran (default — foto yokken) */
-/* Yatay duruyor, kart boyutuna sığacak şekilde */
 .card-bg-watermark {
   position: absolute;
   inset: 0;
@@ -1331,12 +1330,10 @@ button { font-family: inherit; }
   user-select: none;
 }
 
-/* Liste kartında büyük filigran (kartın eninin tamamı kadar) */
 .list-card .card-bg-watermark {
   font-size: clamp(1.8rem, 8vw, 3rem);
 }
 
-/* Galeri kartında daha küçük (kare alan dar) */
 .gallery-card .card-bg-watermark {
   font-size: clamp(0.9rem, 4.5vw, 1.6rem);
   letter-spacing: 0.15em;
@@ -1455,7 +1452,6 @@ button { font-family: inherit; }
   transform: translateX(-50%) translateY(0);
 }
 
-
 /* ============================================ */
 /* LİSTE KART — Alış + Masraf satırı            */
 /* ============================================ */
@@ -1489,4 +1485,350 @@ button { font-family: inherit; }
   color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 500;
+}
+
+/* ============================================ */
+/* ARAÇ DETAY SAYFASI (Faz 6.A)                  */
+/* ============================================ */
+.vehicle-detail-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  animation: wizardSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.vehicle-detail-screen.open { display: flex; }
+
+.detail-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  padding-top: calc(0.8rem + env(safe-area-inset-top));
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.detail-close-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.detail-close-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: var(--bg-elevated);
+}
+
+.detail-header-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.detail-header-spacer { width: 70px; }
+
+.detail-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* HERO ALANI (üst görsel alan) */
+.detail-hero {
+  position: relative;
+  min-height: 200px;
+  background: linear-gradient(135deg, #0a2520 0%, #0f1f1c 50%, #0a1614 100%);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-bg-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2.5rem, 12vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  opacity: 0.08;
+  pointer-events: none;
+  white-space: nowrap;
+  text-shadow: 0 0 30px rgba(0, 212, 170, 0.4);
+  user-select: none;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 1.5rem 1.2rem 1.2rem;
+}
+
+.hero-status-pill {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: var(--accent);
+  color: #003228;
+  margin-bottom: 0.7rem;
+}
+.hero-status-pill.sold { background: var(--warning); color: #4a2900; }
+.hero-status-pill.deleted { background: var(--text-muted); color: #1a1a1a; }
+
+.hero-title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* DETAİL BODY */
+.detail-body {
+  padding: 1.5rem 1.2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* FİYAT BLOĞU */
+.detail-price-block {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.price-item {
+  flex: 1;
+  text-align: center;
+}
+
+.price-item-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.price-item-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+.price-divider {
+  width: 1px;
+  background: var(--border);
+  margin: 0 1rem;
+}
+
+/* SECTION */
+.detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.detail-section-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  padding-left: 0.3rem;
+}
+
+/* INFO GRID (teknik bilgiler) */
+.detail-info-grid {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+.info-row:last-child { border-bottom: none; }
+
+.info-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.info-row.info-danger .info-value {
+  color: var(--error);
+}
+
+/* HASAR ŞEMASI - READONLY MODU */
+.damage-readonly .damage-part {
+  cursor: default !important;
+}
+.damage-readonly .damage-part:hover {
+  stroke: #666 !important;
+  stroke-width: 0.8 !important;
+  opacity: 1 !important;
+}
+.damage-readonly .damage-row {
+  cursor: default !important;
+}
+.damage-readonly .damage-row:hover {
+  background: transparent !important;
+}
+.damage-readonly .damage-row.local:hover { background: rgba(255, 140, 66, 0.08) !important; }
+.damage-readonly .damage-row.painted:hover { background: rgba(52, 152, 219, 0.08) !important; }
+.damage-readonly .damage-row.changed:hover { background: rgba(255, 71, 87, 0.08) !important; }
+
+/* "Tüm parçalar orijinal" notu */
+.detail-empty-note {
+  background: rgba(0, 212, 170, 0.08);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  color: var(--accent);
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.empty-check {
+  font-size: 1.1rem;
+}
+
+/* META BİLGİSİ */
+.detail-meta {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.meta-row:last-child { border-bottom: none; }
+
+.meta-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.meta-value {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* AKSİYON BUTONLARI */
+.detail-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.detail-action-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 1rem 0.6rem;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+.detail-action-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.08);
+}
+.detail-action-btn.danger:hover:not(:disabled) {
+  color: var(--error);
+  border-color: var(--error);
+  background: rgba(255, 71, 87, 0.08);
+}
+.detail-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.detail-actions-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+  font-style: italic;
 }
