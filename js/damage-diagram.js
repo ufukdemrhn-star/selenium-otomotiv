@@ -1,6 +1,6 @@
 // ============================================================
 // damage-diagram.js — Hasar şeması (v10: gerçekçi SVG araç şeması)
-// Üstten görünüm + sağ/sol yan kapılar açılmış + tekerlekler + camlar
+// Üstten görünüm + sağ/sol yan kapılar açılmış + tekerlekler + camlar.
 // ============================================================
 
 export const PARTS = [
