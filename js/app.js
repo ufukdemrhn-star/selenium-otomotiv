@@ -1,9 +1,9 @@
 // ============================================================
 // FAZ 5 — Ana uygulama + wizard + araç listesi
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=9";
-import { openWizard } from "./wizard.js?v=9";
-import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=9";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=10";
+import { openWizard } from "./wizard.js?v=10";
+import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=10";
 
 const screens = {
   splash: document.getElementById('splash-screen'),
@@ -144,4 +144,4 @@ if (addVehicleBtn) {
   addVehicleBtn.addEventListener('click', openWizard);
 }
 
-console.log('🚗 Selenium Otomotiv v0.6 — Faz 5 yüklendi');
+console.log('🚗 Selenium Otomotiv v0.6 — Faz 5 v10 yüklendi');
