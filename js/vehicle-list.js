@@ -1,6 +1,6 @@
 // ============================================================
 // vehicle-list.js — Araç listesi (liste/galeri görünüm, real-time)
-// v10: kart bilgileri güncellendi, damage tag kaldırıldı
+// v10: kart bilgileri güncellendi, damage tag kaldırıldı.
 // ============================================================
 import { listenVehicles } from "./vehicles-db.js?v=10";
 
