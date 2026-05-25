@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <title>Selenium Otomotiv</title>
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 
@@ -54,7 +54,7 @@
         </button>
       </form>
 
-      <div class="login-footer">v0.6 — Faz 5</div>
+      <div class="login-footer">v0.7 — Faz 6.A</div>
     </div>
   </div>
 
@@ -81,9 +81,9 @@
           <div class="welcome-name" id="welcome-name">—</div>
         </div>
         <div class="info-card">
-          <div class="info-card-title">Faz 5 Tamamlandı ✓</div>
+          <div class="info-card-title">Faz 6.A Tamamlandı ✓</div>
           <div class="info-card-text">
-            Hasar şeması, kaydetme ve araç listesi hazır. Faz 6'da araç detay sayfası + foto yükleme + 5-açılı süslü görsel gelecek.
+            Araç detay sayfası hazır. Faz 6.B'de fotoğraf yükleme + vitrin foto özelliği gelecek. Faz 6.C'de 5-açılı süslü ekspertiz görseli gelecek.
           </div>
         </div>
         <div class="placeholder-stats">
@@ -197,6 +197,26 @@
         <span>Profil</span>
       </button>
     </nav>
+  </div>
+
+    <!-- ============================================ -->
+  <!-- ARAÇ DETAY SAYFASI (Faz 6.A)                 -->
+  <!-- ============================================ -->
+  <div id="vehicle-detail" class="vehicle-detail-screen">
+    <header class="detail-header">
+      <button class="detail-close-btn" id="detail-close" aria-label="Kapat">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Geri</span>
+      </button>
+      <div class="detail-header-title">Araç Detayı</div>
+      <div class="detail-header-spacer"></div>
+    </header>
+    <div class="detail-content" id="detail-content">
+      <!-- JS tarafından doldurulacak -->
+    </div>
   </div>
 
   <!-- ============================================ -->
@@ -372,6 +392,6 @@
     </footer>
   </div>
 
-  <script type="module" src="js/app.js?v=10"></script>
+  <script type="module" src="js/app.js?v=11"></script>
 </body>
 </html>
