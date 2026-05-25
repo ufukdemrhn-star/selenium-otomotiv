@@ -1,8 +1,8 @@
 // ============================================================
-// vehicle-list.js — Araç listesi (liste/galeri görünüm, real-time)
-// v10: kart bilgileri güncellendi, damage tag kaldırıldı.
+// vehicle-list.js — Araç listesi (Faz 6.A: karta tıklayınca detay açılır)
 // ============================================================
-import { listenVehicles } from "./vehicles-db.js?v=10";
+import { listenVehicles } from "./vehicles-db.js?v=11";
+import { openVehicleDetail } from "./vehicle-detail.js?v=11";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
@@ -30,7 +30,6 @@ function formatKm(v) {
   return Number(v).toLocaleString('tr-TR') + ' km';
 }
 
-// Masraf toplamı (Faz 7'de doldurulacak)
 function getTotalExpenses(vehicle) {
   if (!vehicle.expenses || !Array.isArray(vehicle.expenses) || vehicle.expenses.length === 0) {
     return null;
@@ -44,16 +43,13 @@ let currentView = localStorage.getItem(VIEW_KEY) || 'list';
 
 let unsubFns = {};
 const cachedData = {};
+const vehiclesById = {}; // id -> vehicle map (detay açarken kullanmak için)
 
-/**
- * Bir araç kartı HTML'i oluştur
- */
 function renderCard(vehicle, view) {
   const title = [vehicle.brand, vehicle.model, vehicle.series].filter(Boolean).join(' ');
   const yearKm = [vehicle.year, formatKm(vehicle.km)].filter(Boolean).join(' · ');
 
   if (view === 'gallery') {
-    // GALERİ: marka/model/seri + yıl + km
     return `
       <div class="vehicle-card gallery-card" data-id="${escapeHtml(vehicle.id)}">
         <div class="card-bg-watermark">SELENIUM</div>
@@ -65,17 +61,10 @@ function renderCard(vehicle, view) {
     `;
   }
 
-  // LİSTE: 4 satır halinde
-  // marka model seri
-  // yıl + km
-  // alış + masraf
-  // vites + yakıt
-
   const price = formatPrice(vehicle.purchasePrice);
   const totalExpenses = getTotalExpenses(vehicle);
   const expenseStr = totalExpenses !== null ? formatPrice(totalExpenses) : '—';
 
-  // Alış + Masraf satırı
   let priceLine = '';
   if (price || totalExpenses !== null) {
     priceLine = `
@@ -87,7 +76,6 @@ function renderCard(vehicle, view) {
     `;
   }
 
-  // Vites + Yakıt satırı
   const transmissionFuel = [
     TRANSMISSION_LABELS[vehicle.transmission],
     FUEL_LABELS[vehicle.fuel]
@@ -138,9 +126,16 @@ function renderSubtab(subtabId, vehicles) {
   const wrapClass = currentView === 'gallery' ? 'vehicle-gallery-grid' : 'vehicle-list';
   container.innerHTML = `<div class="${wrapClass}">${html}</div>`;
 
+  // Karta tıklayınca detay aç
   container.querySelectorAll('.vehicle-card').forEach(card => {
     card.addEventListener('click', () => {
-      alert('Araç detay sayfası Faz 6\'da gelecek 📋\n\nID: ' + card.dataset.id);
+      const id = card.dataset.id;
+      const vehicle = vehiclesById[id];
+      if (vehicle) {
+        openVehicleDetail(vehicle);
+      } else {
+        console.warn('Araç bulunamadı:', id);
+      }
     });
   });
 }
@@ -148,11 +143,9 @@ function renderSubtab(subtabId, vehicles) {
 function setView(view) {
   currentView = view;
   localStorage.setItem(VIEW_KEY, view);
-
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === view);
   });
-
   Object.entries(cachedData).forEach(([subtabId, vehicles]) => {
     renderSubtab(subtabId, vehicles);
   });
@@ -169,6 +162,8 @@ export function initVehicleList() {
     if (unsubFns[status]) unsubFns[status]();
     unsubFns[status] = listenVehicles(status, (vehicles) => {
       cachedData[container] = vehicles;
+      // ID map'i güncelle (detay açmak için)
+      vehicles.forEach(v => { vehiclesById[v.id] = v; });
       renderSubtab(container, vehicles);
     });
   });
