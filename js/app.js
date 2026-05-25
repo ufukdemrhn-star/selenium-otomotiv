@@ -1,9 +1,10 @@
 // ============================================================
-// FAZ 5 — Ana uygulama + wizard + araç listesi.
+// FAZ 6.A — Ana uygulama + wizard + araç listesi + detay sayfası
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=10";
-import { openWizard } from "./wizard.js?v=10";
-import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=10";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=11";
+import { openWizard } from "./wizard.js?v=11";
+import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=11";
+// vehicle-detail.js, vehicle-list.js içinde import ediliyor, burada ayrıca lazım değil
 
 const screens = {
   splash: document.getElementById('splash-screen'),
@@ -23,7 +24,6 @@ onAuthChange(user => {
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
-    // Araç listesini başlat (sadece bir kez)
     if (!vehicleListInitialized) {
       initVehicleList();
       vehicleListInitialized = true;
@@ -45,14 +45,8 @@ const loginButton = document.getElementById('login-button');
 const buttonText = loginButton.querySelector('.button-text');
 const buttonLoader = loginButton.querySelector('.button-loader');
 
-function showError(msg) {
-  loginError.textContent = msg;
-  loginError.hidden = false;
-}
-function clearError() {
-  loginError.hidden = true;
-  loginError.textContent = '';
-}
+function showError(msg) { loginError.textContent = msg; loginError.hidden = false; }
+function clearError() { loginError.hidden = true; loginError.textContent = ''; }
 function setLoading(loading) {
   loginButton.disabled = loading;
   buttonText.hidden = loading;
@@ -64,10 +58,7 @@ loginForm.addEventListener('submit', async (e) => {
   clearError();
   const username = usernameInput.value.trim();
   const password = passwordInput.value;
-  if (!username || !password) {
-    showError('Kullanıcı adı ve şifre gerekli');
-    return;
-  }
+  if (!username || !password) { showError('Kullanıcı adı ve şifre gerekli'); return; }
   setLoading(true);
   try {
     await login(username, password);
@@ -95,9 +86,7 @@ logoutButton.addEventListener('click', async () => {
     clearError();
     setLoading(false);
     switchTab('home');
-  } catch (error) {
-    console.error('Çıkış hatası:', error);
-  }
+  } catch (error) { console.error('Çıkış hatası:', error); }
 });
 
 function translateAuthError(code) {
@@ -133,9 +122,7 @@ subTabs.forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.subtab;
     subTabs.forEach(b => b.classList.toggle('active', b.dataset.subtab === target));
-    subTabContents.forEach(c => {
-      c.hidden = (c.id !== `subtab-${target}`);
-    });
+    subTabContents.forEach(c => { c.hidden = (c.id !== `subtab-${target}`); });
   });
 });
 
@@ -144,4 +131,4 @@ if (addVehicleBtn) {
   addVehicleBtn.addEventListener('click', openWizard);
 }
 
-console.log('🚗 Selenium Otomotiv v0.6 — Faz 5 v10 yüklendi');
+console.log('🚗 Selenium Otomotiv v0.7 — Faz 6.A yüklendi');
