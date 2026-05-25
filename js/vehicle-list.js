@@ -1,9 +1,9 @@
 // ============================================================
 // vehicle-list.js — Araç listesi (liste/galeri görünüm, real-time)
+// v10: kart bilgileri güncellendi, damage tag kaldırıldı
 // ============================================================
-import { listenVehicles } from "./vehicles-db.js?v=9";
+import { listenVehicles } from "./vehicles-db.js?v=10";
 
-// Etiket eşlemeleri
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
   hibrit: 'Hibrit', elektrikli: 'Elektrikli'
@@ -30,68 +30,86 @@ function formatKm(v) {
   return Number(v).toLocaleString('tr-TR') + ' km';
 }
 
-// Global görünüm tercihi (localStorage)
-const VIEW_KEY = 'selenium-vehicle-view';
-let currentView = localStorage.getItem(VIEW_KEY) || 'list'; // 'list' | 'gallery'
+// Masraf toplamı (Faz 7'de doldurulacak)
+function getTotalExpenses(vehicle) {
+  if (!vehicle.expenses || !Array.isArray(vehicle.expenses) || vehicle.expenses.length === 0) {
+    return null;
+  }
+  const total = vehicle.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  return total > 0 ? total : null;
+}
 
-// Aktif unsubscribe fonksiyonları
+const VIEW_KEY = 'selenium-vehicle-view';
+let currentView = localStorage.getItem(VIEW_KEY) || 'list';
+
 let unsubFns = {};
+const cachedData = {};
 
 /**
  * Bir araç kartı HTML'i oluştur
- * view: 'list' veya 'gallery'
  */
 function renderCard(vehicle, view) {
   const title = [vehicle.brand, vehicle.model, vehicle.series].filter(Boolean).join(' ');
   const yearKm = [vehicle.year, formatKm(vehicle.km)].filter(Boolean).join(' · ');
-  const price = formatPrice(vehicle.purchasePrice);
-  const transmissionFuel = [
-    TRANSMISSION_LABELS[vehicle.transmission],
-    FUEL_LABELS[vehicle.fuel]
-  ].filter(Boolean).join(' · ');
-
-  // Has herhangi bir damage işareti var mı?
-  const hasDamage = vehicle.damage && Object.values(vehicle.damage).some(s => s === 'D');
-
-  // Default arkaplan stili
-  const cardClass = view === 'gallery' ? 'vehicle-card gallery-card' : 'vehicle-card list-card';
 
   if (view === 'gallery') {
+    // GALERİ: marka/model/seri + yıl + km
     return `
-      <div class="${cardClass}" data-id="${escapeHtml(vehicle.id)}">
+      <div class="vehicle-card gallery-card" data-id="${escapeHtml(vehicle.id)}">
         <div class="card-bg-watermark">SELENIUM</div>
         <div class="card-content">
           <div class="card-title">${escapeHtml(title)}</div>
           ${yearKm ? `<div class="card-subline">${escapeHtml(yearKm)}</div>` : ''}
         </div>
-        ${hasDamage ? '<div class="damage-tag">Değişen var</div>' : ''}
       </div>
     `;
   }
 
-  // List card
+  // LİSTE: 4 satır halinde
+  // marka model seri
+  // yıl + km
+  // alış + masraf
+  // vites + yakıt
+
+  const price = formatPrice(vehicle.purchasePrice);
+  const totalExpenses = getTotalExpenses(vehicle);
+  const expenseStr = totalExpenses !== null ? formatPrice(totalExpenses) : '—';
+
+  // Alış + Masraf satırı
+  let priceLine = '';
+  if (price || totalExpenses !== null) {
+    priceLine = `
+      <div class="card-line card-price-line">
+        ${price ? `<span class="price-label">Alış:</span> <span class="price-value">${escapeHtml(price)}</span>` : '<span class="price-muted">Alış: —</span>'}
+        <span class="price-sep">·</span>
+        <span class="price-muted">Masraf: ${escapeHtml(expenseStr)}</span>
+      </div>
+    `;
+  }
+
+  // Vites + Yakıt satırı
+  const transmissionFuel = [
+    TRANSMISSION_LABELS[vehicle.transmission],
+    FUEL_LABELS[vehicle.fuel]
+  ].filter(Boolean).join(' · ');
+
   return `
-    <div class="${cardClass}" data-id="${escapeHtml(vehicle.id)}">
+    <div class="vehicle-card list-card" data-id="${escapeHtml(vehicle.id)}">
       <div class="card-bg-watermark">SELENIUM</div>
       <div class="card-content">
         <div class="card-title">${escapeHtml(title)}</div>
         ${yearKm ? `<div class="card-line">${escapeHtml(yearKm)}</div>` : ''}
-        ${price ? `<div class="card-line card-price">${escapeHtml(price)}</div>` : ''}
+        ${priceLine}
         ${transmissionFuel ? `<div class="card-line card-muted">${escapeHtml(transmissionFuel)}</div>` : ''}
       </div>
-      ${hasDamage ? '<div class="damage-tag">Değişen var</div>' : ''}
     </div>
   `;
 }
 
-/**
- * Bir alt-tab'ı çiz
- */
 function renderSubtab(subtabId, vehicles) {
   const container = document.getElementById(subtabId);
   if (!container) return;
 
-  // Boş state
   if (vehicles.length === 0) {
     let emptyTitle = 'Henüz araç yok';
     let emptyHint = '';
@@ -116,12 +134,10 @@ function renderSubtab(subtabId, vehicles) {
     return;
   }
 
-  // Liste / Galeri çiz
   const html = vehicles.map(v => renderCard(v, currentView)).join('');
   const wrapClass = currentView === 'gallery' ? 'vehicle-gallery-grid' : 'vehicle-list';
   container.innerHTML = `<div class="${wrapClass}">${html}</div>`;
 
-  // Kart tıklama (Faz 6'da detay sayfası açacak)
   container.querySelectorAll('.vehicle-card').forEach(card => {
     card.addEventListener('click', () => {
       alert('Araç detay sayfası Faz 6\'da gelecek 📋\n\nID: ' + card.dataset.id);
@@ -129,32 +145,20 @@ function renderSubtab(subtabId, vehicles) {
   });
 }
 
-/**
- * Liste/Galeri görünümünü değiştir
- */
 function setView(view) {
   currentView = view;
   localStorage.setItem(VIEW_KEY, view);
 
-  // Toggle butonlarını güncelle
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === view);
   });
 
-  // Mevcut görünür alt-tab'ı yeniden çiz (cache'te tutulan verilerle)
   Object.entries(cachedData).forEach(([subtabId, vehicles]) => {
     renderSubtab(subtabId, vehicles);
   });
 }
 
-// Görünür araç verilerini cache'te tut (view değiştiğinde yeniden render için)
-const cachedData = {};
-
-/**
- * Tüm listener'ları başlat
- */
 export function initVehicleList() {
-  // 3 alt-tab için dinleyiciler
   const subtabConfig = [
     { status: 'active', container: 'subtab-active' },
     { status: 'sold', container: 'subtab-sold' },
@@ -162,23 +166,19 @@ export function initVehicleList() {
   ];
 
   subtabConfig.forEach(({ status, container }) => {
-    if (unsubFns[status]) unsubFns[status](); // önce eski'yi kapat
+    if (unsubFns[status]) unsubFns[status]();
     unsubFns[status] = listenVehicles(status, (vehicles) => {
       cachedData[container] = vehicles;
       renderSubtab(container, vehicles);
     });
   });
 
-  // Görünüm toggle butonlarını ayarla
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === currentView);
     btn.addEventListener('click', () => setView(btn.dataset.view));
   });
 }
 
-/**
- * Listener'ları kapat (çıkışta)
- */
 export function stopVehicleList() {
   Object.values(unsubFns).forEach(fn => fn && fn());
   unsubFns = {};
