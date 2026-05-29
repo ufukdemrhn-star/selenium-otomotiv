@@ -1,17 +1,19 @@
 // ============================================================
-// vehicle-detail.js — Araç detay sayfası (Faz 6.A)
+// vehicle-detail.js — Araç detay sayfası (Faz 6.C)
+// Real-time vehicle + vitrin foto hero + foto galerisi + 5-açılı showcase
 // ============================================================
-import { createDamageDiagram } from "./damage-diagram.js?v=11";
+import { createDamageDiagram } from "./damage-diagram.js?v=13";
+import { createDamageShowcase } from "./damage-showcase.js?v=13";
+import { listenVehicle } from "./vehicles-db.js?v=13";
+import { createPhotoGallery } from "./photo-gallery.js?v=13";
 
-// Etiket çevirileri
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
   hibrit: 'Hibrit', elektrikli: 'Elektrikli'
 };
 
 const TRANSMISSION_LABELS = {
-  otomatik: 'Otomatik',
-  manuel: 'Manuel'
+  otomatik: 'Otomatik', manuel: 'Manuel'
 };
 
 const BODY_LABELS = {
@@ -59,57 +61,90 @@ function formatKm(v) {
 function formatDate(timestamp) {
   if (!timestamp) return '—';
   let date;
-  if (timestamp.seconds) {
-    date = new Date(timestamp.seconds * 1000);
-  } else if (timestamp.toDate) {
-    date = timestamp.toDate();
-  } else {
-    date = new Date(timestamp);
-  }
+  if (timestamp.seconds) date = new Date(timestamp.seconds * 1000);
+  else if (timestamp.toDate) date = timestamp.toDate();
+  else date = new Date(timestamp);
   return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function getStatusLabel(status) {
+  if (status === 'sold') return 'SATILDI';
+  if (status === 'deleted') return 'SİLİNDİ';
+  return 'AKTİF';
 }
 
 // State
 let currentVehicle = null;
 let detailDamageComponent = null;
+let photoGalleryComponent = null;
+let vehicleUnsubscribe = null;
 
-// DOM elementleri
+// DOM
 const detailScreen = document.getElementById('vehicle-detail');
 const detailContent = document.getElementById('detail-content');
 const detailCloseBtn = document.getElementById('detail-close');
 
-/**
- * Detay sayfasını aç
- */
 export function openVehicleDetail(vehicle) {
+  if (vehicleUnsubscribe) {
+    vehicleUnsubscribe();
+    vehicleUnsubscribe = null;
+  }
+
   currentVehicle = vehicle;
   render();
   detailScreen.classList.add('open');
   document.body.style.overflow = 'hidden';
-  // En üste scroll
   detailContent.scrollTop = 0;
+
+  vehicleUnsubscribe = listenVehicle(vehicle.id, (updated) => {
+    if (!updated) {
+      closeDetail();
+      return;
+    }
+    currentVehicle = updated;
+    updateHero();
+  });
 }
 
-/**
- * Detay sayfasını kapat
- */
 function closeDetail() {
   detailScreen.classList.remove('open');
   document.body.style.overflow = '';
+
+  if (vehicleUnsubscribe) {
+    vehicleUnsubscribe();
+    vehicleUnsubscribe = null;
+  }
+  if (photoGalleryComponent) {
+    photoGalleryComponent.destroy();
+    photoGalleryComponent = null;
+  }
+
   currentVehicle = null;
   detailDamageComponent = null;
 }
 
-/**
- * Detayı render et
- */
+function updateHero() {
+  const v = currentVehicle;
+  if (!v) return;
+
+  const heroEl = detailContent.querySelector('.detail-hero');
+  if (!heroEl) return;
+
+  if (v.coverPhotoData) {
+    heroEl.classList.add('has-photo');
+    heroEl.style.backgroundImage = `url("${v.coverPhotoData}")`;
+  } else {
+    heroEl.classList.remove('has-photo');
+    heroEl.style.backgroundImage = '';
+  }
+}
+
 function render() {
   if (!currentVehicle) return;
 
   const v = currentVehicle;
   const title = [v.brand, v.model, v.series].filter(Boolean).join(' ');
 
-  // Bilgi satırlarını topla (sadece dolu olanları göster)
   const infoRows = [];
   if (v.year) infoRows.push({ label: 'Yıl', value: v.year });
   if (v.km !== null && v.km !== undefined) infoRows.push({ label: 'KM', value: formatKm(v.km) });
@@ -122,27 +157,26 @@ function render() {
   if (v.doors) infoRows.push({ label: 'Kapı', value: v.doors });
   if (v.heavyDamage) infoRows.push({ label: 'Ağır Hasar Kayıtlı', value: 'Evet', danger: true });
 
-  // Masraf toplamı
   let totalExpenses = 0;
   if (v.expenses && Array.isArray(v.expenses)) {
     totalExpenses = v.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
   }
   const expenseStr = totalExpenses > 0 ? formatPrice(totalExpenses) : '—';
 
-  // Hasar var mı?
   const hasDamageData = v.damage && Object.keys(v.damage).length > 0;
+  const hasCoverPhoto = !!v.coverPhotoData;
 
   detailContent.innerHTML = `
-    <!-- HERO ALANI (Faz 6.B'de buraya foto gelecek) -->
-    <div class="detail-hero">
-      <div class="hero-bg-watermark">SELENIUM</div>
+    <!-- HERO -->
+    <div class="detail-hero ${hasCoverPhoto ? 'has-photo' : ''}" ${hasCoverPhoto ? `style="background-image: url('${v.coverPhotoData}')"` : ''}>
+      ${!hasCoverPhoto ? '<div class="hero-bg-watermark">SELENIUM</div>' : ''}
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-status-pill ${v.status}">${getStatusLabel(v.status)}</div>
         <h1 class="hero-title">${escapeHtml(title)}</h1>
-        ${v.year || v.km !== null ? `
+        ${v.year || (v.km !== null && v.km !== undefined) ? `
           <div class="hero-subtitle">
-            ${[v.year, formatKm(v.km) !== '—' ? formatKm(v.km) : null].filter(Boolean).join(' · ')}
+            ${[v.year, (v.km !== null && v.km !== undefined) ? formatKm(v.km) : null].filter(Boolean).join(' · ')}
           </div>
         ` : ''}
       </div>
@@ -150,7 +184,7 @@ function render() {
 
     <div class="detail-body">
 
-      <!-- FİYAT BLOĞU -->
+      <!-- FİYAT -->
       <div class="detail-price-block">
         <div class="price-item">
           <div class="price-item-label">Alış Fiyatı</div>
@@ -161,6 +195,11 @@ function render() {
           <div class="price-item-label">Toplam Masraf</div>
           <div class="price-item-value">${expenseStr}</div>
         </div>
+      </div>
+
+      <!-- FOTOĞRAFLAR -->
+      <div class="detail-section">
+        <div id="photo-gallery-container"></div>
       </div>
 
       <!-- TEKNIK BİLGİLER -->
@@ -178,22 +217,21 @@ function render() {
         </div>
       ` : ''}
 
-      <!-- HASAR ŞEMASI -->
+      <!-- HASAR EKSPERTİZ GÖRSELİ (YENİ - Faz 6.C) -->
+      <div class="detail-section">
+        <h2 class="detail-section-title">Ekspertiz Görseli</h2>
+        <div id="detail-showcase-container"></div>
+      </div>
+
+      <!-- HASAR DETAYI (üstten + parça listesi) -->
       ${hasDamageData ? `
         <div class="detail-section">
-          <h2 class="detail-section-title">Hasar Durumu</h2>
+          <h2 class="detail-section-title">Hasar Detayı</h2>
           <div id="detail-damage-container"></div>
         </div>
-      ` : `
-        <div class="detail-section">
-          <h2 class="detail-section-title">Hasar Durumu</h2>
-          <div class="detail-empty-note">
-            <span class="empty-check">✓</span> Tüm parçalar orijinal
-          </div>
-        </div>
-      `}
+      ` : ''}
 
-      <!-- META BİLGİSİ -->
+      <!-- META -->
       <div class="detail-meta">
         ${v.createdAt ? `
           <div class="meta-row">
@@ -209,7 +247,7 @@ function render() {
         ` : ''}
       </div>
 
-      <!-- AKSİYON BUTONLARI (Faz 7'de aktif olacak) -->
+      <!-- AKSİYONLAR -->
       <div class="detail-actions">
         <button class="detail-action-btn placeholder" disabled>
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -241,7 +279,16 @@ function render() {
     </div>
   `;
 
-  // Hasar şemasını readonly olarak render et
+  // 5-açılı ekspertiz görseli (yeni — Faz 6.C)
+  const showcaseContainer = document.getElementById('detail-showcase-container');
+  if (showcaseContainer) {
+    createDamageShowcase({
+      container: showcaseContainer,
+      damage: v.damage || {}
+    });
+  }
+
+  // Detaylı hasar şeması (readonly)
   if (hasDamageData) {
     const damageContainer = document.getElementById('detail-damage-container');
     if (damageContainer) {
@@ -252,23 +299,33 @@ function render() {
       });
     }
   }
+
+  // Foto galerisi
+  const galleryContainer = document.getElementById('photo-gallery-container');
+  if (galleryContainer) {
+    if (photoGalleryComponent) {
+      photoGalleryComponent.destroy();
+    }
+    photoGalleryComponent = createPhotoGallery({
+      container: galleryContainer,
+      vehicleId: v.id,
+      getCoverPhotoId: () => currentVehicle?.coverPhotoId || null
+    });
+  }
 }
 
-function getStatusLabel(status) {
-  if (status === 'sold') return 'SATILDI';
-  if (status === 'deleted') return 'SİLİNDİ';
-  return 'AKTİF';
-}
-
-// Event listeners
 if (detailCloseBtn) {
   detailCloseBtn.addEventListener('click', closeDetail);
 }
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && detailScreen.classList.contains('open')) {
+    const lightbox = document.getElementById('photo-lightbox');
+    if (lightbox && lightbox.classList.contains('open')) {
+      return;
+    }
     closeDetail();
   }
 });
 
-console.log('📋 vehicle-detail.js v11 yüklendi (Faz 6.A)');
+console.log('📋 vehicle-detail.js v13 yüklendi (Faz 6.C)');
