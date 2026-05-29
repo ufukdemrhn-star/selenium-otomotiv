@@ -7,6 +7,7 @@ import { createDamageShowcase } from "./damage-showcase.js?v=13";
 import { listenVehicle } from "./vehicles-db.js?v=13";
 import { createPhotoGallery } from "./photo-gallery.js?v=13";
 import { openWizard } from "./wizard.js?v=13";
+import { renderExpensesSection } from "./expenses-section.js?v=13";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
@@ -103,7 +104,11 @@ export function openVehicleDetail(vehicle) {
       return;
     }
     currentVehicle = updated;
-    updateHero();
+
+    // Scroll pozisyonunu koru
+    const scrollPos = detailContent.scrollTop;
+    render();
+    detailContent.scrollTop = scrollPos;
   });
 }
 
@@ -248,6 +253,11 @@ function render() {
         </div>
       ` : ''}
 
+      <!-- MASRAFLAR (Faz 7.B) -->
+      <div class="detail-section">
+        <div id="detail-expenses-container"></div>
+      </div>
+
       <!-- META -->
       <div class="detail-meta">
         ${v.createdAt ? `
@@ -330,6 +340,17 @@ function render() {
     });
   }
 
+  // Masraflar bölümü (Faz 7.B)
+  const expensesContainer = document.getElementById('detail-expenses-container');
+  if (expensesContainer) {
+    renderExpensesSection({
+      container: expensesContainer,
+      vehicleId: v.id,
+      expenses: v.expenses || [],
+      readonly: v.status !== 'active' // satılmış/silinmişse readonly
+    });
+  }
+
   // Düzenle butonuna event listener (Faz 7.A)
   const editBtn = document.getElementById('detail-edit-btn');
   if (editBtn) {
@@ -354,4 +375,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-console.log('📋 vehicle-detail.js v14 yüklendi (Faz 7.A)');
+console.log('📋 vehicle-detail.js v15 yüklendi (Faz 7.B)');
