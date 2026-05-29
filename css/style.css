@@ -1780,19 +1780,18 @@ button { font-family: inherit; }
 /* ============================================================ */
 .damage-showcase {
   background: linear-gradient(145deg,
-    rgba(10, 37, 32, 0.6) 0%,
+    rgba(10, 37, 32, 0.35) 0%,
     var(--bg-secondary) 50%,
-    rgba(15, 31, 28, 0.5) 100%);
-  border: 1px solid var(--accent);
+    rgba(15, 31, 28, 0.3) 100%);
+  border: 1px solid var(--border-light);
   border-radius: 18px;
   padding: 1.2rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 212, 170, 0.12),
-              inset 0 0 30px rgba(0, 212, 170, 0.04);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Süslü parlama efekti */
+/* Parlama efekti — çok daha sönük */
 .damage-showcase::before {
   content: '';
   position: absolute;
@@ -1801,7 +1800,7 @@ button { font-family: inherit; }
   width: 60%;
   height: 200%;
   background: radial-gradient(ellipse at center,
-    rgba(0, 212, 170, 0.1) 0%,
+    rgba(0, 212, 170, 0.03) 0%,
     transparent 70%);
   pointer-events: none;
 }
@@ -1837,10 +1836,9 @@ button { font-family: inherit; }
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--text-secondary);
   text-transform: uppercase;
   margin-bottom: 0.3rem;
-  text-shadow: 0 0 8px var(--accent-glow);
 }
 
 .showcase-view {
