@@ -1,8 +1,8 @@
 // ============================================================
-// wizard.js — Yeni araç ekleme wizard'ı (FAZ 5 v9)
+// wizard.js — Yeni araç ekleme wizard'ı (Faz 6.C v13)
 // Step 1: marka/model/seri | Step 2: bilgiler | Step 3: hasar + kaydet
 // ============================================================
-console.log('🧙 wizard.js v13 yüklendi (Faz 6.C)
+console.log('🧙 wizard.js v13 yüklendi (Faz 6.C)');
 
 import {
   getAllBrands,
