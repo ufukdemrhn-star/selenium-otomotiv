@@ -1,5 +1,5 @@
 // ============================================================
-// damage-diagram.js — Hasar şeması (v11: readonly opsiyonu)
+// damage-diagram.js — v13 (Faz 6.C: değişiklik yok, sadece versiyon)
 // ============================================================
 
 export const PARTS = [
@@ -52,18 +52,10 @@ const PART_CENTERS = {
   sol_arka_camurluk:  { x: 80, y: 410 }
 };
 
-/**
- * Hasar şeması komponenti
- * options:
- *   container, initialData, onChange
- *   readonly: true ise sadece görüntüleme (tıklanmaz)
- */
 export function createDamageDiagram({ container, initialData = {}, onChange = () => {}, readonly = false }) {
   let state = { ...initialData };
 
-  function getStatus(partId) {
-    return state[partId] || null;
-  }
+  function getStatus(partId) { return state[partId] || null; }
 
   function setStatus(partId, status) {
     if (status === null) delete state[partId];
