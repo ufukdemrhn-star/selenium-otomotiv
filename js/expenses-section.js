@@ -2,7 +2,7 @@
 // expenses-section.js — Masraf yönetim komponenti (Faz 7.B)
 // Liste + Ekleme modal + Silme
 // ============================================================
-import { addExpense, removeExpense } from "./vehicles-db.js?v=13";
+import { addExpense, removeExpense } from "./vehicles-db.js?v=14";
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>

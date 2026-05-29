@@ -1,7 +1,7 @@
 // ============================================================
 // vehicles-db.js — v13 (Faz 6.C: sadece versiyon, içerik aynı)
 // ============================================================
-import { db, auth } from "./firebase.js?v=13";
+import { db, auth } from "./firebase.js?v=14";
 import {
   collection, doc, addDoc, getDoc, updateDoc, deleteDoc,
   onSnapshot, query, where, serverTimestamp,
@@ -189,3 +189,5 @@ export async function setCoverPhoto(vehicleId, photoId) {
   });
   console.log('⭐ Vitrin değiştirildi:', photoId);
 }
+
+console.log('🚗 vehicles-db.js v14 yüklendi (Faz 7.B: addExpense, removeExpense)');

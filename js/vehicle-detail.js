@@ -2,12 +2,12 @@
 // vehicle-detail.js — Araç detay sayfası (Faz 6.C)
 // Real-time vehicle + vitrin foto hero + foto galerisi + 5-açılı showcase
 // ============================================================
-import { createDamageDiagram } from "./damage-diagram.js?v=13";
-import { createDamageShowcase } from "./damage-showcase.js?v=13";
-import { listenVehicle } from "./vehicles-db.js?v=13";
-import { createPhotoGallery } from "./photo-gallery.js?v=13";
-import { openWizard } from "./wizard.js?v=13";
-import { renderExpensesSection } from "./expenses-section.js?v=13";
+import { createDamageDiagram } from "./damage-diagram.js?v=14";
+import { createDamageShowcase } from "./damage-showcase.js?v=14";
+import { listenVehicle } from "./vehicles-db.js?v=14";
+import { createPhotoGallery } from "./photo-gallery.js?v=14";
+import { openWizard } from "./wizard.js?v=14";
+import { renderExpensesSection } from "./expenses-section.js?v=14";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
