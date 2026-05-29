@@ -6,6 +6,7 @@ import { createDamageDiagram } from "./damage-diagram.js?v=13";
 import { createDamageShowcase } from "./damage-showcase.js?v=13";
 import { listenVehicle } from "./vehicles-db.js?v=13";
 import { createPhotoGallery } from "./photo-gallery.js?v=13";
+import { openWizard } from "./wizard.js?v=13";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
@@ -130,12 +131,28 @@ function updateHero() {
   const heroEl = detailContent.querySelector('.detail-hero');
   if (!heroEl) return;
 
+  // Hero arkaplanı güncelle
   if (v.coverPhotoData) {
     heroEl.classList.add('has-photo');
     heroEl.style.backgroundImage = `url("${v.coverPhotoData}")`;
+    // Filigran div'i varsa kaldır
+    const watermark = heroEl.querySelector('.hero-bg-watermark');
+    if (watermark) watermark.remove();
   } else {
     heroEl.classList.remove('has-photo');
     heroEl.style.backgroundImage = '';
+    // Filigran div yoksa ekle (foto silindikten sonra geri gelmesi için)
+    if (!heroEl.querySelector('.hero-bg-watermark')) {
+      const wm = document.createElement('div');
+      wm.className = 'hero-bg-watermark';
+      wm.textContent = 'SELENIUM';
+      heroEl.insertBefore(wm, heroEl.firstChild);
+    }
+  }
+
+  // Foto galerisini yeniden render et (vitrin badge güncellensin)
+  if (photoGalleryComponent && photoGalleryComponent.refresh) {
+    photoGalleryComponent.refresh();
   }
 }
 
@@ -249,7 +266,7 @@ function render() {
 
       <!-- AKSİYONLAR -->
       <div class="detail-actions">
-        <button class="detail-action-btn placeholder" disabled>
+        <button class="detail-action-btn" id="detail-edit-btn">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -273,7 +290,7 @@ function render() {
       </div>
 
       <div class="detail-actions-hint">
-        Düzenle/Sat/Sil butonları Faz 7'de aktif olacak
+        Sat/Sil butonları Faz 7.C/D'de aktif olacak
       </div>
 
     </div>
@@ -312,6 +329,15 @@ function render() {
       getCoverPhotoId: () => currentVehicle?.coverPhotoId || null
     });
   }
+
+  // Düzenle butonuna event listener (Faz 7.A)
+  const editBtn = document.getElementById('detail-edit-btn');
+  if (editBtn) {
+    editBtn.addEventListener('click', () => {
+      if (!currentVehicle) return;
+      openWizard(currentVehicle);
+    });
+  }
 }
 
 if (detailCloseBtn) {
@@ -328,4 +354,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-console.log('📋 vehicle-detail.js v13 yüklendi (Faz 6.C)');
+console.log('📋 vehicle-detail.js v14 yüklendi (Faz 7.A)');

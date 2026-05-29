@@ -2,7 +2,7 @@
 // wizard.js — Yeni araç ekleme wizard'ı (Faz 6.C v13)
 // Step 1: marka/model/seri | Step 2: bilgiler | Step 3: hasar + kaydet
 // ============================================================
-console.log('🧙 wizard.js v13 yüklendi (Faz 6.C)');
+console.log('🧙 wizard.js v14 yüklendi (Faz 7.A)');
 
 import {
   getAllBrands,
@@ -22,7 +22,7 @@ import {
   createToggle
 } from "./form-components.js?v=13";
 import { createDamageDiagram } from "./damage-diagram.js?v=13";
-import { addVehicle } from "./vehicles-db.js?v=13";
+import { addVehicle, updateVehicle } from "./vehicles-db.js?v=13";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
@@ -34,6 +34,9 @@ const initialState = () => ({
   isOpen: false,
   step: 1,
   brands: {},
+
+  // Düzenleme modu (Faz 7.A)
+  editingVehicleId: null, // null = yeni araç, dolu = düzenle
 
   selectedBrand: null,
   selectedModel: null,
@@ -117,17 +120,51 @@ const DRIVE_OPTIONS = [
 // ============================================================
 // AÇMA / KAPAMA
 // ============================================================
-export async function openWizard() {
+export async function openWizard(vehicleToEdit = null) {
   if (state.isOpen) return;
 
   state = initialState();
+
+  // Düzenleme modu — state'i mevcut araç verisiyle doldur
+  if (vehicleToEdit) {
+    state.editingVehicleId = vehicleToEdit.id;
+    state.selectedBrand = vehicleToEdit.brand || null;
+    state.selectedModel = vehicleToEdit.model || null;
+    state.selectedSeries = vehicleToEdit.series || null;
+    state.purchasePrice = vehicleToEdit.purchasePrice ?? null;
+    state.year = vehicleToEdit.year || 2010;
+    state.km = vehicleToEdit.km ?? null;
+    state.transmission = vehicleToEdit.transmission || null;
+    state.fuel = vehicleToEdit.fuel || null;
+    state.bodyType = vehicleToEdit.bodyType || null;
+    state.enginePower = vehicleToEdit.enginePower || null;
+    state.customEnginePower = vehicleToEdit.customEnginePower || null;
+    state.drive = vehicleToEdit.drive || null;
+    state.doors = vehicleToEdit.doors || null;
+    state.heavyDamage = vehicleToEdit.heavyDamage || false;
+    state.damage = vehicleToEdit.damage || {};
+  }
+
   state.isOpen = true;
   wizard.classList.add('open');
   document.body.style.overflow = 'hidden';
 
+  // Başlık ve buton metnini moda göre güncelle
+  const titleEl = document.querySelector('.wizard-title');
+  if (titleEl) {
+    titleEl.textContent = vehicleToEdit ? 'Aracı Düzenle' : 'Yeni Araç Ekle';
+  }
+
   resetStep2DOM();
   resetStep3DOM();
-  showStep(1);
+
+  // Düzenleme modunda direkt Step 1'i göster + seçili marka/model/seriyi pill olarak yansıt
+  if (vehicleToEdit) {
+    // Step 1'deki search'leri açma — direkt pill'leri göster
+    showStep(1);
+  } else {
+    showStep(1);
+  }
 
   const loadingEl = document.getElementById('wizard-loading');
   loadingEl.hidden = false;
@@ -135,12 +172,57 @@ export async function openWizard() {
   try {
     state.brands = await getAllBrands();
     loadingEl.hidden = true;
-    initBrandSearch();
+
+    if (vehicleToEdit) {
+      // Düzenleme: pill'leri göster, search'ler gizli
+      initBrandSearch();
+      reflectSelectedBrand();
+      if (state.selectedBrand) {
+        initModelSearch();
+        reflectSelectedModel();
+        if (state.selectedModel) {
+          initSeriesSearch();
+          if (state.selectedSeries) {
+            reflectSelectedSeries();
+          }
+        }
+      }
+      updateNextButton();
+    } else {
+      initBrandSearch();
+    }
   } catch (err) {
     loadingEl.hidden = true;
     alert('Markalar yüklenemedi: ' + err.message);
     closeWizard(true);
   }
+}
+
+// Düzenleme modunda mevcut seçimleri pill olarak yansıt
+function reflectSelectedBrand() {
+  if (!state.selectedBrand) return;
+  const pill = document.getElementById('selected-brand');
+  pill.hidden = false;
+  pill.querySelector('.pill-text').textContent = state.selectedBrand;
+  document.getElementById('brand-search-container').hidden = true;
+}
+
+function reflectSelectedModel() {
+  if (!state.selectedModel) return;
+  const pill = document.getElementById('selected-model');
+  document.getElementById('model-block').hidden = false;
+  pill.hidden = false;
+  pill.querySelector('.pill-text').textContent = state.selectedModel;
+  document.getElementById('model-search-container').hidden = true;
+}
+
+function reflectSelectedSeries() {
+  if (!state.selectedSeries) return;
+  const pill = document.getElementById('selected-series');
+  document.getElementById('series-block').hidden = false;
+  pill.hidden = false;
+  pill.querySelector('.pill-text').textContent = state.selectedSeries;
+  document.getElementById('series-search-container').hidden = true;
 }
 
 function hasAnyData() {
@@ -150,13 +232,21 @@ function hasAnyData() {
 }
 
 function closeWizard(skipConfirm = false) {
+  const isEditing = !!state.editingVehicleId;
   if (!skipConfirm && hasAnyData()) {
-    if (!confirm('Çıkmak istediğine emin misin? Yaptığın tüm değişiklikler silinecek.')) {
+    const msg = isEditing
+      ? 'Düzenlemeyi iptal etmek istediğine emin misin? Yaptığın değişiklikler kaybolacak.'
+      : 'Çıkmak istediğine emin misin? Yaptığın tüm değişiklikler silinecek.';
+    if (!confirm(msg)) {
       return;
     }
   }
   wizard.classList.remove('open');
   document.body.style.overflow = '';
+
+  // Wizard başlığını varsayılana çevir
+  const titleEl = document.querySelector('.wizard-title');
+  if (titleEl) titleEl.textContent = 'Yeni Araç Ekle';
 
   step2Components = {};
   damageComponent = null;
@@ -210,7 +300,8 @@ function showStep(n) {
     }
     updateNextButton();
   } else if (n === 3) {
-    nextBtn.querySelector('.btn-text').textContent = '✓ Kaydet';
+    const isEditing = !!state.editingVehicleId;
+    nextBtn.querySelector('.btn-text').textContent = isEditing ? '✓ Güncelle' : '✓ Kaydet';
     if (!damageComponent) {
       initStep3();
     }
@@ -509,20 +600,25 @@ async function handleNext() {
 }
 
 async function saveVehicle() {
+  const isEditing = !!state.editingVehicleId;
   nextBtn.disabled = true;
-  nextBtn.querySelector('.btn-text').textContent = 'Kaydediliyor...';
+  nextBtn.querySelector('.btn-text').textContent = isEditing ? 'Güncelleniyor...' : 'Kaydediliyor...';
 
   try {
-    const id = await addVehicle(state);
-    // Başarılı — wizard'ı kapat (onay sormadan, kaydedildi çünkü)
+    if (isEditing) {
+      await updateVehicle(state.editingVehicleId, state);
+    } else {
+      await addVehicle(state);
+    }
+    // Başarılı — wizard'ı kapat
     state.isOpen = true; // hasAnyData kontrolünü atla
     closeWizard(true);
-    showToast('✓ Araç başarıyla eklendi');
+    showToast(isEditing ? '✓ Araç güncellendi' : '✓ Araç başarıyla eklendi');
   } catch (err) {
     console.error('Kaydetme hatası:', err);
     nextBtn.disabled = false;
-    nextBtn.querySelector('.btn-text').textContent = '✓ Kaydet';
-    alert('Kaydetme başarısız: ' + err.message);
+    nextBtn.querySelector('.btn-text').textContent = isEditing ? '✓ Güncelle' : '✓ Kaydet';
+    alert((isEditing ? 'Güncelleme' : 'Kaydetme') + ' başarısız: ' + err.message);
   }
 }
 

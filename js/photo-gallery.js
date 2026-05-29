@@ -261,5 +261,5 @@ export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
   }
 
   start();
-  return { destroy };
+  return { destroy, refresh: render };
 }

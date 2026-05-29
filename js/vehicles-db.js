@@ -26,6 +26,38 @@ export async function addVehicle(vehicle) {
   return ref.id;
 }
 
+/**
+ * Mevcut aracı güncelle (Faz 7.A)
+ * Sadece wizard alanlarını günceller, foto/masraf/status alanlarına dokunmaz
+ */
+export async function updateVehicle(vehicleId, vehicle) {
+  const user = auth.currentUser;
+  const username = user?.email?.split('@')[0] || 'bilinmiyor';
+  const updates = {
+    brand: vehicle.selectedBrand,
+    model: vehicle.selectedModel,
+    series: vehicle.selectedSeries || null,
+    purchasePrice: vehicle.purchasePrice,
+    year: vehicle.year,
+    km: vehicle.km,
+    transmission: vehicle.transmission,
+    fuel: vehicle.fuel,
+    bodyType: vehicle.bodyType,
+    enginePower: vehicle.enginePower,
+    customEnginePower: vehicle.customEnginePower,
+    drive: vehicle.drive,
+    doors: vehicle.doors,
+    heavyDamage: vehicle.heavyDamage,
+    damage: vehicle.damage || {},
+    updatedAt: serverTimestamp(),
+    updatedBy: username
+  };
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, updates);
+  console.log('✏️ Araç güncellendi:', vehicleId);
+  return vehicleId;
+}
+
 export function listenVehicles(status, callback) {
   const q = query(collection(db, 'vehicles'), where('status', '==', status));
   return onSnapshot(q,
