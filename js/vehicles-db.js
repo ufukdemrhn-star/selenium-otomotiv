@@ -4,7 +4,8 @@
 import { db, auth } from "./firebase.js?v=13";
 import {
   collection, doc, addDoc, getDoc, updateDoc, deleteDoc,
-  onSnapshot, query, where, serverTimestamp
+  onSnapshot, query, where, serverTimestamp,
+  arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 export async function addVehicle(vehicle) {
@@ -56,6 +57,47 @@ export async function updateVehicle(vehicleId, vehicle) {
   await updateDoc(ref, updates);
   console.log('✏️ Araç güncellendi:', vehicleId);
   return vehicleId;
+}
+
+// ============================================================
+// MASRAF İŞLEMLERİ (Faz 7.B)
+// ============================================================
+
+/**
+ * Masraf ekle
+ * expense: { date: "YYYY-MM-DD", description: string, amount: number }
+ */
+export async function addExpense(vehicleId, expense) {
+  const user = auth.currentUser;
+  const username = user?.email?.split('@')[0] || 'bilinmiyor';
+
+  const expenseRecord = {
+    id: 'exp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
+    date: expense.date,
+    description: expense.description || '',
+    amount: Number(expense.amount) || 0,
+    createdAt: new Date().toISOString(),
+    createdBy: username
+  };
+
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, {
+    expenses: arrayUnion(expenseRecord)
+  });
+  console.log('💸 Masraf eklendi:', expenseRecord.id);
+  return expenseRecord;
+}
+
+/**
+ * Masraf sil
+ * expense: tam masraf objesi (Firestore arrayRemove tam eşleşme arar)
+ */
+export async function removeExpense(vehicleId, expense) {
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, {
+    expenses: arrayRemove(expense)
+  });
+  console.log('🗑️ Masraf silindi:', expense.id);
 }
 
 export function listenVehicles(status, callback) {
