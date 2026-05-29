@@ -1,39 +1,30 @@
 // ============================================================
-// FAZ 6.A — Ana uygulama + wizard + araç listesi + detay sayfası
+// FAZ 6.C — Ana uygulama
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=11";
-import { openWizard } from "./wizard.js?v=11";
-import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=11";
-// vehicle-detail.js, vehicle-list.js içinde import ediliyor, burada ayrıca lazım değil
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=13";
+import { openWizard } from "./wizard.js?v=13";
+import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=13";
 
 const screens = {
   splash: document.getElementById('splash-screen'),
   login: document.getElementById('login-screen'),
   home: document.getElementById('home-screen')
 };
-
 function showScreen(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
 }
 
 let vehicleListInitialized = false;
-
 onAuthChange(user => {
   if (user) {
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
-    if (!vehicleListInitialized) {
-      initVehicleList();
-      vehicleListInitialized = true;
-    }
+    if (!vehicleListInitialized) { initVehicleList(); vehicleListInitialized = true; }
   } else {
     showScreen('login');
-    if (vehicleListInitialized) {
-      stopVehicleList();
-      vehicleListInitialized = false;
-    }
+    if (vehicleListInitialized) { stopVehicleList(); vehicleListInitialized = false; }
   }
 });
 
@@ -66,7 +57,6 @@ loginForm.addEventListener('submit', async (e) => {
   } catch (error) {
     setLoading(false);
     showError(translateAuthError(error.code));
-    console.error('Giriş hatası:', error.code, error.message);
   }
 });
 
@@ -105,19 +95,14 @@ function translateAuthError(code) {
 
 const navItems = document.querySelectorAll('.nav-item');
 const tabContents = document.querySelectorAll('.tab-content');
-
 function switchTab(tabName) {
   navItems.forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
   tabContents.forEach(c => c.classList.toggle('active', c.id === `tab-${tabName}`));
 }
-
-navItems.forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
+navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
 const subTabs = document.querySelectorAll('.sub-tab');
 const subTabContents = document.querySelectorAll('.sub-tab-content');
-
 subTabs.forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.subtab;
@@ -127,8 +112,6 @@ subTabs.forEach(btn => {
 });
 
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
-if (addVehicleBtn) {
-  addVehicleBtn.addEventListener('click', openWizard);
-}
+if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v0.7 — Faz 6.A yüklendi');
+console.log('🚗 Selenium Otomotiv v0.9 — Faz 6.C yüklendi');
