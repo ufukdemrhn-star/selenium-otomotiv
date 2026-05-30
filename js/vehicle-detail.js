@@ -2,12 +2,14 @@
 // vehicle-detail.js — Araç detay sayfası (Faz 6.C)
 // Real-time vehicle + vitrin foto hero + foto galerisi + 5-açılı showcase
 // ============================================================
-import { createDamageDiagram } from "./damage-diagram.js?v=14";
-import { createDamageShowcase } from "./damage-showcase.js?v=14";
-import { listenVehicle } from "./vehicles-db.js?v=14";
-import { createPhotoGallery } from "./photo-gallery.js?v=14";
-import { openWizard } from "./wizard.js?v=14";
-import { renderExpensesSection } from "./expenses-section.js?v=14";
+import { createDamageDiagram } from "./damage-diagram.js?v=15";
+import { createDamageShowcase } from "./damage-showcase.js?v=15";
+import { listenVehicle, restoreSoldVehicle, softDeleteVehicle, restoreDeletedVehicle, hardDeleteVehicle } from "./vehicles-db.js?v=15";
+import { createPhotoGallery } from "./photo-gallery.js?v=15";
+import { openWizard } from "./wizard.js?v=15";
+import { renderExpensesSection } from "./expenses-section.js?v=15";
+import { openSellModal } from "./sell-modal.js?v=15";
+import { showConfirm, showAlert, showToast } from "./ui-dialogs.js?v=15";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
@@ -188,6 +190,15 @@ function render() {
   const hasDamageData = v.damage && Object.keys(v.damage).length > 0;
   const hasCoverPhoto = !!v.coverPhotoData;
 
+  // Faz 7.C — satılmış araç ise kâr hesapla
+  const isSold = v.status === 'sold';
+  const isDeleted = v.status === 'deleted';
+  const isActive = v.status === 'active';
+  const purchasePrice = Number(v.purchasePrice) || 0;
+  const salePrice = Number(v.soldPrice) || 0;
+  const profit = isSold ? (salePrice - purchasePrice - totalExpenses) : 0;
+  const profitClass = profit >= 0 ? 'positive' : 'negative';
+
   detailContent.innerHTML = `
     <!-- HERO -->
     <div class="detail-hero ${hasCoverPhoto ? 'has-photo' : ''}" ${hasCoverPhoto ? `style="background-image: url('${v.coverPhotoData}')"` : ''}>
@@ -206,18 +217,46 @@ function render() {
 
     <div class="detail-body">
 
-      <!-- FİYAT -->
-      <div class="detail-price-block">
-        <div class="price-item">
-          <div class="price-item-label">Alış Fiyatı</div>
-          <div class="price-item-value">${formatPrice(v.purchasePrice)}</div>
+      ${isSold ? `
+        <!-- SATIŞ ÖZETİ (Faz 7.C) -->
+        <div class="sold-summary-block">
+          <div class="sold-row">
+            <span class="sold-label">Alış</span>
+            <span class="sold-value">${formatPrice(purchasePrice)}</span>
+          </div>
+          <div class="sold-row">
+            <span class="sold-label">Masraf</span>
+            <span class="sold-value">${formatPrice(totalExpenses)}</span>
+          </div>
+          <div class="sold-row sold-row-divider">
+            <span class="sold-label">Satış</span>
+            <span class="sold-value sold-value-highlight">${formatPrice(salePrice)}</span>
+          </div>
+          <div class="sold-row sold-row-profit ${profitClass}">
+            <span class="sold-label">${profit >= 0 ? 'KÂR' : 'ZARAR'}</span>
+            <span class="sold-value">${formatPrice(Math.abs(profit))}</span>
+          </div>
+          ${v.soldAt ? `
+            <div class="sold-meta">
+              Satış Tarihi: ${formatDate({ seconds: new Date(v.soldAt).getTime() / 1000 })}
+              ${v.soldBy ? ` · Satan: ${escapeHtml(v.soldBy)}` : ''}
+            </div>
+          ` : ''}
         </div>
-        <div class="price-divider"></div>
-        <div class="price-item">
-          <div class="price-item-label">Toplam Masraf</div>
-          <div class="price-item-value">${expenseStr}</div>
+      ` : `
+        <!-- FİYAT (aktif araç) -->
+        <div class="detail-price-block">
+          <div class="price-item">
+            <div class="price-item-label">Alış Fiyatı</div>
+            <div class="price-item-value">${formatPrice(v.purchasePrice)}</div>
+          </div>
+          <div class="price-divider"></div>
+          <div class="price-item">
+            <div class="price-item-label">Toplam Masraf</div>
+            <div class="price-item-value">${expenseStr}</div>
+          </div>
         </div>
-      </div>
+      `}
 
       <!-- FOTOĞRAFLAR -->
       <div class="detail-section">
@@ -276,32 +315,76 @@ function render() {
 
       <!-- AKSİYONLAR -->
       <div class="detail-actions">
-        <button class="detail-action-btn" id="detail-edit-btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          Düzenle
-        </button>
-        <button class="detail-action-btn placeholder" disabled>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          Sat
-        </button>
-        <button class="detail-action-btn placeholder danger" disabled>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-          Sil
-        </button>
+        ${isDeleted ? `
+          <!-- Silinmiş araç: Geri Yükle + Kalıcı Sil -->
+          <button class="detail-action-btn restore" id="detail-restore-deleted-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            Geri Yükle
+          </button>
+          <button class="detail-action-btn danger" id="detail-hard-delete-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+            Kalıcı Sil
+          </button>
+        ` : isSold ? `
+          <!-- Satılmış araç: Satışı Geri Al + Sil -->
+          <button class="detail-action-btn restore" id="detail-restore-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            Satışı Geri Al
+          </button>
+          <button class="detail-action-btn danger" id="detail-delete-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Sil
+          </button>
+        ` : `
+          <!-- Aktif araç: Düzenle, Sat, Sil -->
+          <button class="detail-action-btn" id="detail-edit-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Düzenle
+          </button>
+          <button class="detail-action-btn sell" id="detail-sell-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Sat
+          </button>
+          <button class="detail-action-btn danger" id="detail-delete-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Sil
+          </button>
+        `}
       </div>
 
-      <div class="detail-actions-hint">
-        Sat/Sil butonları Faz 7.C/D'de aktif olacak
-      </div>
+      ${isDeleted ? `
+        <div class="detail-deleted-info">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Bu araç silindi. Geri Yükle ile eski durumuna döndür veya Kalıcı Sil ile veritabanından tamamen kaldır.
+        </div>
+      ` : ''}
 
     </div>
   `;
@@ -336,7 +419,8 @@ function render() {
     photoGalleryComponent = createPhotoGallery({
       container: galleryContainer,
       vehicleId: v.id,
-      getCoverPhotoId: () => currentVehicle?.coverPhotoId || null
+      getCoverPhotoId: () => currentVehicle?.coverPhotoData ? currentVehicle.coverPhotoId : null,
+      readonly: v.status !== 'active' // satılmış/silinmişse foto işlemleri yok
     });
   }
 
@@ -359,6 +443,132 @@ function render() {
       openWizard(currentVehicle);
     });
   }
+
+  // Sat butonuna event listener (Faz 7.C)
+  const sellBtn = document.getElementById('detail-sell-btn');
+  if (sellBtn) {
+    sellBtn.addEventListener('click', async () => {
+      if (!currentVehicle) return;
+      await openSellModal(currentVehicle);
+      // sell-modal kendi toast'ını gösterir, real-time listener detayı günceller
+    });
+  }
+
+  // Satışı Geri Al butonuna event listener (Faz 7.C)
+  const restoreBtn = document.getElementById('detail-restore-btn');
+  if (restoreBtn) {
+    restoreBtn.addEventListener('click', async () => {
+      if (!currentVehicle) return;
+      const ok = await showConfirm({
+        title: 'Satışı Geri Al',
+        message: 'Bu aracın satışını iptal etmek istediğine emin misin? Araç tekrar aktif listede görünecek, satış bilgileri silinecek.',
+        confirmText: 'Geri Al',
+        cancelText: 'Vazgeç',
+        danger: true
+      });
+      if (!ok) return;
+
+      try {
+        await restoreSoldVehicle(currentVehicle.id);
+        showToast('↩️ Satış iptal edildi');
+      } catch (err) {
+        console.error(err);
+        showAlert({ title: 'Hata', message: 'Satış iptal edilemedi: ' + err.message, danger: true });
+      }
+    });
+  }
+
+  // Sil butonuna event listener (Faz 7.D) — soft delete
+  const deleteBtn = document.getElementById('detail-delete-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (!currentVehicle) return;
+      const ok = await showConfirm({
+        title: 'Aracı Sil',
+        message: 'Bu aracı silmek istediğine emin misin? Araç "Silinenler" sekmesine taşınacak. İstersen oradan geri yükleyebilirsin.',
+        confirmText: 'Sil',
+        cancelText: 'İptal',
+        danger: true
+      });
+      if (!ok) return;
+
+      try {
+        // Mevcut status'ü kaydet ki geri yüklenirse oraya dönsün
+        const previousStatus = currentVehicle.status;
+        await softDeleteVehicle(currentVehicle.id, previousStatus);
+        closeDetail();
+        showToast('🗑️ Araç silindi (Silinenler sekmesine taşındı)');
+      } catch (err) {
+        console.error(err);
+        showAlert({ title: 'Hata', message: 'Silme başarısız: ' + err.message, danger: true });
+      }
+    });
+  }
+
+  // Geri Yükle butonuna event listener (Faz 7.D) — silinmiş aracı geri yükle
+  const restoreDeletedBtn = document.getElementById('detail-restore-deleted-btn');
+  if (restoreDeletedBtn) {
+    restoreDeletedBtn.addEventListener('click', async () => {
+      if (!currentVehicle) return;
+      const targetLabel = currentVehicle.previousStatus === 'sold' ? 'Satılanlar' : 'Aktif';
+      const ok = await showConfirm({
+        title: 'Aracı Geri Yükle',
+        message: `Bu aracı "${targetLabel}" sekmesine geri yükle?`,
+        confirmText: 'Geri Yükle',
+        cancelText: 'Vazgeç'
+      });
+      if (!ok) return;
+
+      try {
+        const targetStatus = await restoreDeletedVehicle(currentVehicle.id);
+        const label = targetStatus === 'sold' ? 'Satılanlar' : 'Aktif';
+        showToast(`↩️ Araç ${label} sekmesine geri yüklendi`);
+      } catch (err) {
+        console.error(err);
+        showAlert({ title: 'Hata', message: 'Geri yükleme başarısız: ' + err.message, danger: true });
+      }
+    });
+  }
+
+  // Kalıcı Sil butonuna event listener (Faz 7.D) — Firestore'dan tamamen kaldır
+  const hardDeleteBtn = document.getElementById('detail-hard-delete-btn');
+  if (hardDeleteBtn) {
+    hardDeleteBtn.addEventListener('click', async () => {
+      if (!currentVehicle) return;
+      const title = [currentVehicle.brand, currentVehicle.model, currentVehicle.series].filter(Boolean).join(' ');
+      const photoInfo = currentVehicle.photoCount > 0
+        ? `\n\n${currentVehicle.photoCount} fotoğraf da silinecek.`
+        : '';
+
+      const ok = await showConfirm({
+        title: '⚠️ Kalıcı Silme',
+        message: `"${title}" aracını veritabanından TAMAMEN silmek istediğine emin misin? Bu işlem geri alınamaz.${photoInfo}`,
+        confirmText: 'Evet, Kalıcı Sil',
+        cancelText: 'Vazgeç',
+        danger: true
+      });
+      if (!ok) return;
+
+      // Çift onay - yanlışlıkla basılmasın
+      const ok2 = await showConfirm({
+        title: 'Son Onay',
+        message: 'Gerçekten kalıcı olarak silmek istiyor musun?\n\nTüm bilgiler, fotoğraflar ve geçmiş kaybolacak ve GERİ ALINAMAYACAK.',
+        confirmText: 'Evet, Kalıcı Olarak Sil',
+        cancelText: 'Hayır, Vazgeç',
+        danger: true
+      });
+      if (!ok2) return;
+
+      try {
+        await hardDeleteVehicle(currentVehicle.id);
+        closeDetail();
+        showToast('💀 Araç kalıcı olarak silindi');
+      } catch (err) {
+        console.error(err);
+        showAlert({ title: 'Hata', message: 'Kalıcı silme başarısız: ' + err.message, danger: true });
+      }
+    });
+  }
 }
 
 if (detailCloseBtn) {
@@ -375,4 +585,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-console.log('📋 vehicle-detail.js v15 yüklendi (Faz 7.B)');
+console.log('📋 vehicle-detail.js v15 yüklendi (Faz 7.D: Sil + Geri Yükle + Kalıcı Sil)');

@@ -2,7 +2,7 @@
 // wizard.js — Yeni araç ekleme wizard'ı (Faz 6.C v13)
 // Step 1: marka/model/seri | Step 2: bilgiler | Step 3: hasar + kaydet
 // ============================================================
-console.log('🧙 wizard.js v14 yüklendi (Faz 7.A)');
+console.log('🧙 wizard.js v15 yüklendi (Faz 7.D)');
 
 import {
   getAllBrands,
@@ -11,8 +11,8 @@ import {
   addSeries,
   getModelsForBrand,
   getSeriesForModel
-} from "./brands-db.js?v=13";
-import { createSearchableList } from "./vehicle-search.js?v=13";
+} from "./brands-db.js?v=15";
+import { createSearchableList } from "./vehicle-search.js?v=15";
 import {
   createYearWheel,
   createSegmented,
@@ -20,9 +20,10 @@ import {
   createNumberInput,
   createRadioGroup,
   createToggle
-} from "./form-components.js?v=13";
-import { createDamageDiagram } from "./damage-diagram.js?v=13";
-import { addVehicle, updateVehicle } from "./vehicles-db.js?v=13";
+} from "./form-components.js?v=15";
+import { createDamageDiagram } from "./damage-diagram.js?v=15";
+import { addVehicle, updateVehicle } from "./vehicles-db.js?v=15";
+import { showConfirm, showAlert, showToast } from "./ui-dialogs.js?v=15";
 
 const wizard = document.getElementById('add-vehicle-wizard');
 const closeBtn = document.getElementById('wizard-close');
@@ -193,7 +194,7 @@ export async function openWizard(vehicleToEdit = null) {
     }
   } catch (err) {
     loadingEl.hidden = true;
-    alert('Markalar yüklenemedi: ' + err.message);
+    await showAlert({ title: 'Yükleme Hatası', message: 'Markalar yüklenemedi: ' + err.message, danger: true });
     closeWizard(true);
   }
 }
@@ -231,15 +232,19 @@ function hasAnyData() {
          Object.keys(state.damage).length > 0;
 }
 
-function closeWizard(skipConfirm = false) {
+async function closeWizard(skipConfirm = false) {
   const isEditing = !!state.editingVehicleId;
   if (!skipConfirm && hasAnyData()) {
-    const msg = isEditing
-      ? 'Düzenlemeyi iptal etmek istediğine emin misin? Yaptığın değişiklikler kaybolacak.'
-      : 'Çıkmak istediğine emin misin? Yaptığın tüm değişiklikler silinecek.';
-    if (!confirm(msg)) {
-      return;
-    }
+    const ok = await showConfirm({
+      title: isEditing ? 'Düzenlemeyi İptal Et' : 'Wizard\'dan Çık',
+      message: isEditing
+        ? 'Düzenlemeyi iptal etmek istediğine emin misin? Yaptığın değişiklikler kaybolacak.'
+        : 'Çıkmak istediğine emin misin? Yaptığın tüm değişiklikler silinecek.',
+      confirmText: 'Evet, çık',
+      cancelText: 'Vazgeç',
+      danger: true
+    });
+    if (!ok) return;
   }
   wizard.classList.remove('open');
   document.body.style.overflow = '';
@@ -357,13 +362,19 @@ function clearBrand() {
 }
 
 async function addNewBrand(brandName) {
-  if (!confirm(`"${brandName}" markası kalıcı olarak listeye eklenecek. Onaylıyor musun?`)) return;
+  const ok = await showConfirm({
+    title: 'Yeni Marka Ekle',
+    message: `"${brandName}" markası kalıcı olarak listeye eklenecek. Onaylıyor musun?`,
+    confirmText: 'Ekle',
+    cancelText: 'İptal'
+  });
+  if (!ok) return;
   try {
     await addBrand(brandName);
     state.brands[brandName] = {};
     selectBrand(brandName);
   } catch (err) {
-    alert('Hata: ' + err.message);
+    showAlert({ title: 'Hata', message: err.message, danger: true });
   }
 }
 
@@ -406,12 +417,18 @@ function clearModel() {
 
 async function addNewModel(modelName) {
   if (!state.selectedBrand) return;
-  if (!confirm(`"${modelName}" modeli "${state.selectedBrand}" markasının altına eklenecek. Onaylıyor musun?`)) return;
+  const ok = await showConfirm({
+    title: 'Yeni Model Ekle',
+    message: `"${modelName}" modeli "${state.selectedBrand}" markasının altına eklenecek. Onaylıyor musun?`,
+    confirmText: 'Ekle',
+    cancelText: 'İptal'
+  });
+  if (!ok) return;
   try {
     await addModel(state.selectedBrand, modelName);
     selectModel(modelName);
   } catch (err) {
-    alert('Hata: ' + err.message);
+    showAlert({ title: 'Hata', message: err.message, danger: true });
   }
 }
 
@@ -447,12 +464,18 @@ function clearSeries() {
 
 async function addNewSeries(seriesName) {
   if (!state.selectedBrand || !state.selectedModel) return;
-  if (!confirm(`"${seriesName}" serisi "${state.selectedBrand} ${state.selectedModel}" altına eklenecek. Onaylıyor musun?`)) return;
+  const ok = await showConfirm({
+    title: 'Yeni Seri Ekle',
+    message: `"${seriesName}" serisi "${state.selectedBrand} ${state.selectedModel}" altına eklenecek. Onaylıyor musun?`,
+    confirmText: 'Ekle',
+    cancelText: 'İptal'
+  });
+  if (!ok) return;
   try {
     await addSeries(state.selectedBrand, state.selectedModel, seriesName);
     selectSeries(seriesName);
   } catch (err) {
-    alert('Hata: ' + err.message);
+    showAlert({ title: 'Hata', message: err.message, danger: true });
   }
 }
 
@@ -618,21 +641,12 @@ async function saveVehicle() {
     console.error('Kaydetme hatası:', err);
     nextBtn.disabled = false;
     nextBtn.querySelector('.btn-text').textContent = isEditing ? '✓ Güncelle' : '✓ Kaydet';
-    alert((isEditing ? 'Güncelleme' : 'Kaydetme') + ' başarısız: ' + err.message);
+    showAlert({
+      title: isEditing ? 'Güncelleme Hatası' : 'Kaydetme Hatası',
+      message: err.message,
+      danger: true
+    });
   }
-}
-
-function showToast(message) {
-  let toast = document.getElementById('app-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'app-toast';
-    toast.className = 'app-toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function handlePrev() {

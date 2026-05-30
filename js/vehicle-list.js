@@ -1,8 +1,8 @@
 // ============================================================
 // vehicle-list.js — v13 (Faz 6.C: sadece versiyon)
 // ============================================================
-import { listenVehicles } from "./vehicles-db.js?v=13";
-import { openVehicleDetail } from "./vehicle-detail.js?v=13";
+import { listenVehicles } from "./vehicles-db.js?v=15";
+import { openVehicleDetail } from "./vehicle-detail.js?v=15";
 
 const FUEL_LABELS = {
   benzinli: 'Benzinli', benzin_lpg: 'Benzin & LPG', dizel: 'Dizel',
@@ -46,10 +46,18 @@ function renderCard(vehicle, view) {
   const photoClass = hasCoverPhoto ? 'has-photo' : '';
 
   if (view === 'gallery') {
+    const isSoldGallery = vehicle.status === 'sold';
+    const isDeletedGallery = vehicle.status === 'deleted';
+    let extraClass = '';
+    if (isSoldGallery) extraClass = 'sold-card';
+    else if (isDeletedGallery) extraClass = 'deleted-card';
+
     return `
-      <div class="vehicle-card gallery-card ${photoClass}" data-id="${escapeHtml(vehicle.id)}" ${photoStyle}>
+      <div class="vehicle-card gallery-card ${photoClass} ${extraClass}" data-id="${escapeHtml(vehicle.id)}" ${photoStyle}>
         ${!hasCoverPhoto ? '<div class="card-bg-watermark">SELENIUM</div>' : ''}
         <div class="card-overlay"></div>
+        ${isSoldGallery ? '<div class="card-sold-tag">SATILDI</div>' : ''}
+        ${isDeletedGallery ? '<div class="card-deleted-tag">SİLİNDİ</div>' : ''}
         <div class="card-content">
           <div class="card-title">${escapeHtml(title)}</div>
           ${yearKm ? `<div class="card-subline">${escapeHtml(yearKm)}</div>` : ''}
@@ -61,9 +69,29 @@ function renderCard(vehicle, view) {
   const price = formatPrice(vehicle.purchasePrice);
   const totalExpenses = getTotalExpenses(vehicle);
   const expenseStr = totalExpenses !== null ? formatPrice(totalExpenses) : '—';
+  const isSold = vehicle.status === 'sold';
+  const isDeleted = vehicle.status === 'deleted';
 
   let priceLine = '';
-  if (price || totalExpenses !== null) {
+  if (isSold) {
+    // Satılmış araç — Satış + Kâr
+    const purchasePrice = Number(vehicle.purchasePrice) || 0;
+    const salePrice = Number(vehicle.soldPrice) || 0;
+    const totalExp = totalExpenses || 0;
+    const profit = salePrice - purchasePrice - totalExp;
+    const profitLabel = profit >= 0 ? 'Kâr' : 'Zarar';
+    const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+
+    priceLine = `
+      <div class="card-line card-price-line">
+        <span class="price-label">Satış:</span>
+        <span class="price-value">${escapeHtml(formatPrice(salePrice))}</span>
+        <span class="price-sep">·</span>
+        <span class="${profitClass}">${profitLabel}: ${escapeHtml(formatPrice(Math.abs(profit)))}</span>
+      </div>
+    `;
+  } else if (price || totalExpenses !== null) {
+    // Aktif veya silinmiş araç — Alış + Masraf
     priceLine = `
       <div class="card-line card-price-line">
         ${price ? `<span class="price-label">Alış:</span> <span class="price-value">${escapeHtml(price)}</span>` : '<span class="price-muted">Alış: —</span>'}
@@ -78,10 +106,16 @@ function renderCard(vehicle, view) {
     FUEL_LABELS[vehicle.fuel]
   ].filter(Boolean).join(' · ');
 
+  let extraCardClass = '';
+  if (isSold) extraCardClass = 'sold-card';
+  else if (isDeleted) extraCardClass = 'deleted-card';
+
   return `
-    <div class="vehicle-card list-card ${photoClass}" data-id="${escapeHtml(vehicle.id)}" ${photoStyle}>
+    <div class="vehicle-card list-card ${photoClass} ${extraCardClass}" data-id="${escapeHtml(vehicle.id)}" ${photoStyle}>
       ${!hasCoverPhoto ? '<div class="card-bg-watermark">SELENIUM</div>' : ''}
       <div class="card-overlay"></div>
+      ${isSold ? '<div class="card-sold-tag">SATILDI</div>' : ''}
+      ${isDeleted ? '<div class="card-deleted-tag">SİLİNDİ</div>' : ''}
       <div class="card-content">
         <div class="card-title">${escapeHtml(title)}</div>
         ${yearKm ? `<div class="card-line">${escapeHtml(yearKm)}</div>` : ''}

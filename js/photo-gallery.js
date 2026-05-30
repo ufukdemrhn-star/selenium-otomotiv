@@ -1,8 +1,9 @@
 // ============================================================
 // photo-gallery.js — v13 (Faz 6.C: sadece versiyon)
 // ============================================================
-import { compressImage, base64Size, formatBytes } from "./photo-utils.js?v=13";
-import { listenVehiclePhotos, addPhoto, removePhoto, setCoverPhoto } from "./vehicles-db.js?v=13";
+import { compressImage, base64Size, formatBytes } from "./photo-utils.js?v=15";
+import { listenVehiclePhotos, addPhoto, removePhoto, setCoverPhoto } from "./vehicles-db.js?v=15";
+import { showConfirm, showAlert } from "./ui-dialogs.js?v=15";
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
@@ -10,7 +11,7 @@ function escapeHtml(s) {
   );
 }
 
-export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
+export function createPhotoGallery({ container, vehicleId, getCoverPhotoId, readonly = false }) {
   let photos = [];
   let unsubscribe = null;
   let currentLightboxIndex = -1;
@@ -26,14 +27,16 @@ export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
             Fotoğraflar
             ${photoCount > 0 ? `<span class="photo-count-badge">${photoCount}</span>` : ''}
           </h3>
-          <button type="button" class="photo-add-btn" id="photo-add-btn-${vehicleId}">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            <span>Foto Ekle</span>
-          </button>
-          <input type="file" accept="image/*" multiple class="photo-file-input" id="photo-file-input-${vehicleId}" hidden>
+          ${!readonly ? `
+            <button type="button" class="photo-add-btn" id="photo-add-btn-${vehicleId}">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Foto Ekle</span>
+            </button>
+            <input type="file" accept="image/*" multiple class="photo-file-input" id="photo-file-input-${vehicleId}" hidden>
+          ` : ''}
         </div>
 
         <div class="photo-upload-progress" hidden>
@@ -121,7 +124,7 @@ export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
       progressEl.hidden = true;
       progressBar.style.width = '0%';
     }, 2000);
-    if (errors > 0) alert(`${errors} foto yüklenemedi.`);
+    if (errors > 0) showAlert({ title: 'Hata', message: `${errors} foto yüklenemedi.`, danger: true });
   }
 
   function openLightbox(index) {
@@ -183,21 +186,23 @@ export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
       <div class="lightbox-image-wrapper">
         <img src="${escapeHtml(photo.data)}" alt="Foto ${currentLightboxIndex + 1}">
       </div>
-      <div class="lightbox-actions">
-        <button type="button" class="lightbox-action ${isCover ? 'is-cover' : ''}" id="lightbox-cover-btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="${isCover ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-          <span>${isCover ? 'Vitrin Foto' : 'Vitrin Yap'}</span>
-        </button>
-        <button type="button" class="lightbox-action danger" id="lightbox-delete-btn">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-          <span>Sil</span>
-        </button>
-      </div>
+      ${!readonly ? `
+        <div class="lightbox-actions">
+          <button type="button" class="lightbox-action ${isCover ? 'is-cover' : ''}" id="lightbox-cover-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="${isCover ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span>${isCover ? 'Vitrin Foto' : 'Vitrin Yap'}</span>
+          </button>
+          <button type="button" class="lightbox-action danger" id="lightbox-delete-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            <span>Sil</span>
+          </button>
+        </div>
+      ` : ''}
     `;
     lightbox.classList.add('open');
 
@@ -207,25 +212,40 @@ export function createPhotoGallery({ container, vehicleId, getCoverPhotoId }) {
     if (prevBtn) prevBtn.addEventListener('click', () => navigateLightbox(-1));
     if (nextBtn) nextBtn.addEventListener('click', () => navigateLightbox(1));
 
-    document.getElementById('lightbox-cover-btn').addEventListener('click', async () => {
-      if (isCover) return;
-      try { await setCoverPhoto(vehicleId, photo.id); }
-      catch (err) { alert('Vitrin yapılamadı: ' + err.message); }
-    });
+    if (!readonly) {
+      const coverBtn = document.getElementById('lightbox-cover-btn');
+      if (coverBtn) {
+        coverBtn.addEventListener('click', async () => {
+          if (isCover) return;
+          try { await setCoverPhoto(vehicleId, photo.id); }
+          catch (err) { showAlert({ title: 'Hata', message: 'Vitrin yapılamadı: ' + err.message, danger: true }); }
+        });
+      }
 
-    document.getElementById('lightbox-delete-btn').addEventListener('click', async () => {
-      if (!confirm('Bu fotoğrafı silmek istediğine emin misin?')) return;
-      try {
-        await removePhoto(vehicleId, photo.id);
-        if (photos.length > 1) {
-          if (currentLightboxIndex >= photos.length - 1) {
-            currentLightboxIndex = photos.length - 2;
-          }
-        } else {
-          closeLightbox();
-        }
-      } catch (err) { alert('Silme başarısız: ' + err.message); }
-    });
+      const deleteBtn = document.getElementById('lightbox-delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+          const ok = await showConfirm({
+            title: 'Fotoğrafı Sil',
+            message: 'Bu fotoğrafı silmek istediğine emin misin?',
+            confirmText: 'Sil',
+            cancelText: 'İptal',
+            danger: true
+          });
+          if (!ok) return;
+          try {
+            await removePhoto(vehicleId, photo.id);
+            if (photos.length > 1) {
+              if (currentLightboxIndex >= photos.length - 1) {
+                currentLightboxIndex = photos.length - 2;
+              }
+            } else {
+              closeLightbox();
+            }
+          } catch (err) { showAlert({ title: 'Hata', message: 'Silme başarısız: ' + err.message, danger: true }); }
+        });
+      }
+    }
 
     const handleKey = (e) => {
       if (!lightbox.classList.contains('open')) return;

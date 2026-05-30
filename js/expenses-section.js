@@ -2,7 +2,8 @@
 // expenses-section.js — Masraf yönetim komponenti (Faz 7.B)
 // Liste + Ekleme modal + Silme
 // ============================================================
-import { addExpense, removeExpense } from "./vehicles-db.js?v=14";
+import { addExpense, removeExpense } from "./vehicles-db.js?v=15";
+import { showConfirm, showAlert } from "./ui-dialogs.js?v=15";
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
@@ -116,14 +117,20 @@ export function renderExpensesSection({ container, vehicleId, expenses = [], rea
         const expense = expenses.find(x => x.id === expId);
         if (!expense) return;
 
-        const msg = `Bu masrafı silmek istediğine emin misin?\n\n${formatDateDisplay(expense.date)} — ${formatPrice(expense.amount)}${expense.description ? '\n' + expense.description : ''}`;
-        if (!confirm(msg)) return;
+        const ok = await showConfirm({
+          title: 'Masrafı Sil',
+          message: `Bu masrafı silmek istediğine emin misin?\n\n${formatDateDisplay(expense.date)} — ${formatPrice(expense.amount)}${expense.description ? '\n' + expense.description : ''}`,
+          confirmText: 'Sil',
+          cancelText: 'İptal',
+          danger: true
+        });
+        if (!ok) return;
 
         try {
           await removeExpense(vehicleId, expense);
           // Detay sayfası real-time listener ile kendini yenileyecek
         } catch (err) {
-          alert('Masraf silinemedi: ' + err.message);
+          showAlert({ title: 'Hata', message: 'Masraf silinemedi: ' + err.message, danger: true });
           console.error(err);
         }
       });
@@ -267,4 +274,4 @@ function openExpenseModal(vehicleId) {
   });
 }
 
-console.log('💸 expenses-section.js v14 yüklendi (Faz 7.B)');
+console.log('💸 expenses-section.js v15 yüklendi (Faz 7.B)');

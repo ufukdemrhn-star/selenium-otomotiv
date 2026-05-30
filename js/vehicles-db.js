@@ -1,7 +1,7 @@
 // ============================================================
 // vehicles-db.js — v13 (Faz 6.C: sadece versiyon, içerik aynı)
 // ============================================================
-import { db, auth } from "./firebase.js?v=14";
+import { db, auth } from "./firebase.js?v=15";
 import {
   collection, doc, addDoc, getDoc, updateDoc, deleteDoc,
   onSnapshot, query, where, serverTimestamp,
@@ -100,6 +100,113 @@ export async function removeExpense(vehicleId, expense) {
   console.log('🗑️ Masraf silindi:', expense.id);
 }
 
+// ============================================================
+// SATIŞ İŞLEMLERİ (Faz 7.C)
+// ============================================================
+
+/**
+ * Aracı sat — status='sold' yapar, satış fiyatı ve tarihini kaydeder
+ * @param {string} vehicleId
+ * @param {Object} sale - { salePrice: number, soldAt: "YYYY-MM-DD" }
+ */
+export async function sellVehicle(vehicleId, sale) {
+  const user = auth.currentUser;
+  const username = user?.email?.split('@')[0] || 'bilinmiyor';
+
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, {
+    status: 'sold',
+    soldPrice: Number(sale.salePrice) || 0,
+    soldAt: sale.soldAt,
+    soldBy: username
+  });
+  console.log('💰 Araç satıldı:', vehicleId);
+}
+
+/**
+ * Satıştan geri al — tekrar aktif yapar
+ */
+export async function restoreSoldVehicle(vehicleId) {
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, {
+    status: 'active',
+    soldPrice: null,
+    soldAt: null,
+    soldBy: null
+  });
+  console.log('↩️ Satış iptal edildi:', vehicleId);
+}
+
+// ============================================================
+// SİLME İŞLEMLERİ (Faz 7.D)
+// ============================================================
+
+/**
+ * Aracı sil (soft delete) — status='deleted' yapar
+ * @param {string} vehicleId
+ * @param {string} previousStatus - geri yüklenirse hangi duruma dönecek ('active' | 'sold')
+ */
+export async function softDeleteVehicle(vehicleId, previousStatus = 'active') {
+  const user = auth.currentUser;
+  const username = user?.email?.split('@')[0] || 'bilinmiyor';
+
+  const ref = doc(db, 'vehicles', vehicleId);
+  await updateDoc(ref, {
+    status: 'deleted',
+    deletedAt: serverTimestamp(),
+    deletedBy: username,
+    previousStatus: previousStatus
+  });
+  console.log('🗑️ Araç silindi (soft):', vehicleId);
+}
+
+/**
+ * Silinen aracı geri yükle (önceki durumuna döner: active veya sold)
+ */
+export async function restoreDeletedVehicle(vehicleId) {
+  const ref = doc(db, 'vehicles', vehicleId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) throw new Error('Araç bulunamadı');
+
+  const data = snap.data();
+  const targetStatus = data.previousStatus || 'active';
+
+  await updateDoc(ref, {
+    status: targetStatus,
+    deletedAt: null,
+    deletedBy: null,
+    previousStatus: null
+  });
+  console.log('↩️ Araç geri yüklendi:', vehicleId, '→', targetStatus);
+  return targetStatus;
+}
+
+/**
+ * Aracı kalıcı olarak sil — Firestore'dan tamamen kaldırır
+ * Önce tüm foto subcollection'ını siler, sonra ana doc'u
+ */
+export async function hardDeleteVehicle(vehicleId) {
+  // Önce alt koleksiyonu (fotoları) sil
+  const photosRef = collection(db, 'vehicles', vehicleId, 'photos');
+  const snapshot = await new Promise((resolve, reject) => {
+    const unsub = onSnapshot(photosRef,
+      (snap) => { unsub(); resolve(snap); },
+      (err) => { unsub(); reject(err); }
+    );
+  });
+
+  // Tüm fotoları paralel sil
+  const deletePromises = [];
+  snapshot.forEach(d => {
+    deletePromises.push(deleteDoc(doc(db, 'vehicles', vehicleId, 'photos', d.id)));
+  });
+  await Promise.all(deletePromises);
+
+  // Ana doc'u sil
+  await deleteDoc(doc(db, 'vehicles', vehicleId));
+  console.log('💀 Araç kalıcı silindi:', vehicleId, '(', deletePromises.length, 'foto dahil)');
+}
+
 export function listenVehicles(status, callback) {
   const q = query(collection(db, 'vehicles'), where('status', '==', status));
   return onSnapshot(q,
@@ -190,4 +297,4 @@ export async function setCoverPhoto(vehicleId, photoId) {
   console.log('⭐ Vitrin değiştirildi:', photoId);
 }
 
-console.log('🚗 vehicles-db.js v14 yüklendi (Faz 7.B: addExpense, removeExpense)');
+console.log('🚗 vehicles-db.js v15 yüklendi (Faz 7.D: softDelete, restoreDeleted, hardDelete)');

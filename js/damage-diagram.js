@@ -1,6 +1,8 @@
 // ============================================================
-// damage-diagram.js — v13 (Faz 6.C: değişiklik yok, sadece versiyon)
+// damage-diagram.js — Hasar şeması (v14: confirm modal)
+// readonly opsiyonu + gerçekçi SVG araç şeması
 // ============================================================
+import { showConfirm } from "./ui-dialogs.js?v=15";
 
 export const PARTS = [
   { id: 'on_tampon',         label: 'Ön Tampon' },
@@ -69,10 +71,17 @@ export function createDamageDiagram({ container, initialData = {}, onChange = ()
     setStatus(partId, NEXT_STATUS[getStatus(partId)]);
   }
 
-  function resetAll() {
+  async function resetAll() {
     if (readonly) return;
     if (Object.keys(state).length === 0) return;
-    if (!confirm('Tüm parçaları orijinal yapmak istediğine emin misin?')) return;
+    const ok = await showConfirm({
+      title: 'Tümünü Sıfırla',
+      message: 'Tüm parçaları orijinal yapmak istediğine emin misin?',
+      confirmText: 'Sıfırla',
+      cancelText: 'İptal',
+      danger: true
+    });
+    if (!ok) return;
     state = {};
     render();
     onChange({ ...state });

@@ -1,9 +1,11 @@
 // ============================================================
 // FAZ 6.C — Ana uygulama
 // ============================================================
-import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=13";
-import { openWizard } from "./wizard.js?v=13";
-import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=13";
+import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=15";
+import { openWizard } from "./wizard.js?v=15";
+import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=15";
+import { showConfirm } from "./ui-dialogs.js?v=15";
+import { initHomeStats, stopHomeStats } from "./home-stats.js?v=16";
 
 const screens = {
   splash: document.getElementById('splash-screen'),
@@ -16,15 +18,26 @@ function showScreen(name) {
 }
 
 let vehicleListInitialized = false;
+let homeStatsInitialized = false;
+
 onAuthChange(user => {
   if (user) {
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
     if (!vehicleListInitialized) { initVehicleList(); vehicleListInitialized = true; }
+    // Faz 8 — Home istatistikleri
+    if (!homeStatsInitialized) {
+      const statsContainer = document.getElementById('home-stats-container');
+      if (statsContainer) {
+        initHomeStats(statsContainer);
+        homeStatsInitialized = true;
+      }
+    }
   } else {
     showScreen('login');
     if (vehicleListInitialized) { stopVehicleList(); vehicleListInitialized = false; }
+    if (homeStatsInitialized) { stopHomeStats(); homeStatsInitialized = false; }
   }
 });
 
@@ -69,7 +82,13 @@ togglePassword.addEventListener('click', () => {
 
 const logoutButton = document.getElementById('logout-button');
 logoutButton.addEventListener('click', async () => {
-  if (!confirm('Çıkış yapmak istediğine emin misin?')) return;
+  const ok = await showConfirm({
+    title: 'Çıkış',
+    message: 'Çıkış yapmak istediğine emin misin?',
+    confirmText: 'Çıkış Yap',
+    cancelText: 'İptal'
+  });
+  if (!ok) return;
   try {
     await logout();
     loginForm.reset();
@@ -114,4 +133,4 @@ subTabs.forEach(btn => {
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v0.9 — Faz 6.C yüklendi');
+console.log('🚗 Selenium Otomotiv v1.2 — Faz 8 yüklendi');

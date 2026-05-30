@@ -4,7 +4,7 @@
 // Sadece görüntüleme amaçlı — düzenleme yok
 // ============================================================
 
-import { PARTS } from "./damage-diagram.js?v=13";
+import { PARTS } from "./damage-diagram.js?v=15";
 
 // Hangi parça, hangi açılarda görünür?
 // Açılar: top, frontLeft, frontRight, rearLeft, rearRight
