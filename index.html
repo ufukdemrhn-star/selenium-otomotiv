@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <title>Selenium Otomotiv</title>
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
 
@@ -80,17 +80,10 @@
           <div class="welcome-label">Hoşgeldin,</div>
           <div class="welcome-name" id="welcome-name">—</div>
         </div>
-        <div class="info-card">
-          <div class="info-card-title">Faz 6.C Tamamlandı ✓</div>
-          <div class="info-card-text">
-            5-açılı ekspertiz görseli, foto yükleme + vitrin foto + araç detay sayfası tamamlandı. Faz 7'de düzenle/sat/sil + masraf yönetimi gelecek.
-          </div>
-        </div>
-        <div class="placeholder-stats">
-          <div class="stat-card"><div class="stat-label">Aktif Araç</div><div class="stat-value">—</div></div>
-          <div class="stat-card"><div class="stat-label">Toplam Kar</div><div class="stat-value">—</div></div>
-          <div class="stat-card"><div class="stat-label">Satılan</div><div class="stat-value">—</div></div>
-          <div class="stat-card"><div class="stat-label">Toplam Masraf</div><div class="stat-value">—</div></div>
+
+        <!-- Faz 8: Real-time istatistikler + aylık kar grafiği -->
+        <div id="home-stats-container" class="home-stats-container">
+          <div class="stats-loading">Yükleniyor...</div>
         </div>
       </section>
 
@@ -390,6 +383,6 @@
     </footer>
   </div>
 
-  <script type="module" src="js/app.js?v=13"></script>
+  <script type="module" src="js/app.js?v=16"></script>
 </body>
 </html>
