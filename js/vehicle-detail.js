@@ -419,7 +419,7 @@ function render() {
     photoGalleryComponent = createPhotoGallery({
       container: galleryContainer,
       vehicleId: v.id,
-      getCoverPhotoId: () => currentVehicle?.coverPhotoData ? currentVehicle.coverPhotoId : null,
+      getCoverPhotoId: () => currentVehicle?.coverPhotoId || null,
       readonly: v.status !== 'active' // satılmış/silinmişse foto işlemleri yok
     });
   }

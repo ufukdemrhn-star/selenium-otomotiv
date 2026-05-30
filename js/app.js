@@ -1,10 +1,11 @@
 // ============================================================
-// FAZ 7.D — Ana uygulama
+// FAZ 8 — Ana uygulama
 // ============================================================
 import { onAuthChange, login, logout, emailToUsername } from "./auth.js?v=15";
 import { openWizard } from "./wizard.js?v=15";
 import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=15";
 import { showConfirm } from "./ui-dialogs.js?v=15";
+import { initHomeStats, stopHomeStats } from "./home-stats.js?v=17";
 
 const screens = {
   splash: document.getElementById('splash-screen'),
@@ -17,15 +18,25 @@ function showScreen(name) {
 }
 
 let vehicleListInitialized = false;
+let homeStatsInitialized = false;
+
 onAuthChange(user => {
   if (user) {
     document.getElementById('welcome-name').textContent = emailToUsername(user.email);
     showScreen('home');
     console.log('✅ Giriş yapıldı:', emailToUsername(user.email));
     if (!vehicleListInitialized) { initVehicleList(); vehicleListInitialized = true; }
+    if (!homeStatsInitialized) {
+      const statsContainer = document.getElementById('home-stats-container');
+      if (statsContainer) {
+        initHomeStats(statsContainer);
+        homeStatsInitialized = true;
+      }
+    }
   } else {
     showScreen('login');
     if (vehicleListInitialized) { stopVehicleList(); vehicleListInitialized = false; }
+    if (homeStatsInitialized) { stopHomeStats(); homeStatsInitialized = false; }
   }
 });
 
@@ -121,4 +132,4 @@ subTabs.forEach(btn => {
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v1.1 — Faz 7.D yüklendi');
+console.log('🚗 Selenium Otomotiv v1.2 — Faz 8 v17 yüklendi');
