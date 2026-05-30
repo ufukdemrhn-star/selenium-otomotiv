@@ -3009,3 +3009,150 @@ button { font-family: inherit; }
     font-size: 1.2rem;
   }
 }
+
+/* ============================================ */
+/* FAZ 8 v17 — Düzeltmeler                       */
+/* ============================================ */
+
+/* Splash logosu mobilde sığsın */
+@media (max-width: 480px) {
+  .splash-content .logo {
+    font-size: clamp(2rem, 9vw, 3rem);
+    letter-spacing: 0.15em;
+  }
+  .splash-content {
+    padding: 1.5rem;
+  }
+}
+
+/* iOS date input modal taşmasını düzelt */
+.modal-input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+  min-height: 44px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 0.9rem; /* normal padding ile aynı */
+  text-align: left;
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+/* iOS date input içindeki indicator butonu da terbiye et */
+.modal-input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  width: 100%;
+}
+
+.modal-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* Chart range tabs (segmented control) */
+.chart-range-tabs {
+  display: flex;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.range-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem 0.5rem;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.18s;
+}
+.range-btn:hover {
+  color: var(--text-secondary);
+}
+.range-btn.active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* Chart wrap — yatay scroll için */
+.chart-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-wrap svg {
+  height: 100%;
+  display: block;
+}
+
+/* Scroll bar daha ince */
+.chart-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.chart-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chart-wrap::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+.chart-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* Chart header artık header-left + total */
+.chart-header-left {
+  flex: 1;
+}
+
+/* Chart-footer eski tooltip listesi artık yok — gizle */
+.chart-footer {
+  display: none;
+}
+
+/* Stats error display */
+.stats-error {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* Mobilde grafik */
+@media (max-width: 500px) {
+  .chart-wrap {
+    height: 180px;
+  }
+  .chart-total {
+    font-size: 1.1rem;
+  }
+  .chart-title {
+    font-size: 0.95rem;
+  }
+  .range-btn {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.4rem;
+  }
+}
