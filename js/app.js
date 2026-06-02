@@ -7,7 +7,7 @@ import { initVehicleList, stopVehicleList } from "./vehicle-list.js?v=15";
 import { showConfirm } from "./ui-dialogs.js?v=15";
 import { initHomeStats, stopHomeStats } from "./home-stats.js?v=17";
 import { loadTheme } from "./theme-manager.js?v=17";
-import { initProfile } from "./profile.js?v=18";
+import { initProfile } from "./profile.js?v=19";
 
 // Tema'yı en başta yükle (login öncesi de gerekli, splash ekranı için)
 loadTheme();
@@ -146,4 +146,4 @@ subTabs.forEach(btn => {
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v1.4 — Faz 9.A+B yüklendi');
+console.log('🚗 Selenium Otomotiv v1.5 — Faz 9.C yüklendi');

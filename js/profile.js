@@ -5,7 +5,7 @@
 import { emailToUsername } from "./auth.js?v=15";
 import { THEMES, setTheme, getCurrentTheme } from "./theme-manager.js?v=17";
 import { auth } from "./firebase.js?v=15";
-import { initBoard, stopBoard } from "./board.js?v=18";
+import { initBoard, stopBoard } from "./board.js?v=19";
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
@@ -37,7 +37,12 @@ function render() {
       </div>
     </div>
 
-    <!-- Tema seçici -->
+    <!-- Bizim Alanımız (Not + Sayaç) -->
+    <div class="profile-section">
+      <div id="board-container"></div>
+    </div>
+
+    <!-- Tema seçici (en altta) -->
     <div class="profile-section">
       <h2 class="profile-section-title">Tema</h2>
       <p class="profile-section-desc">Tercih ettiğin renk paletini seç. Sadece senin için kaydedilir.</p>
@@ -60,11 +65,6 @@ function render() {
           </button>
         `).join('')}
       </div>
-    </div>
-
-    <!-- Kara Tahta (Faz 9.B) -->
-    <div class="profile-section">
-      <div id="board-container"></div>
     </div>
   `;
 
@@ -100,4 +100,4 @@ export function stopProfile() {
   currentContainer = null;
 }
 
-console.log('👤 profile.js v18 yüklendi (Faz 9.A+B)');
+console.log('👤 profile.js v19 yüklendi (Faz 9.C: Bizim Alanımız)');
