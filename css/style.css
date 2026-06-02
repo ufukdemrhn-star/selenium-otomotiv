@@ -4342,3 +4342,71 @@ button { font-family: inherit; }
     font-size: 0.52rem;
   }
 }
+
+/* ============================================ */
+/* FAZ 10 — Çıkış Yap butonu (profilde)           */
+/* ============================================ */
+.profile-logout-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.profile-logout-btn {
+  width: 100%;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  color: var(--error);
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.18s;
+}
+
+.profile-logout-btn:hover {
+  background: rgba(255, 71, 87, 0.15);
+  border-color: var(--error);
+  transform: translateY(-1px);
+}
+
+.profile-logout-btn:active {
+  transform: scale(0.98);
+}
+
+/* ============================================ */
+/* PWA — Standalone mode düzeltmeleri            */
+/* ============================================ */
+
+/* Safe area için padding (iOS notch / Android navigation bar) */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Bottom nav alt safe-area */
+  .bottom-nav {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* Header üst safe-area */
+  .app-header {
+    padding-top: calc(0.7rem + env(safe-area-inset-top));
+  }
+}
+
+/* iOS PWA özel düzenleme (status bar overlap) */
+@supports (-webkit-touch-callout: none) {
+  @media (display-mode: standalone) {
+    .splash-content {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
