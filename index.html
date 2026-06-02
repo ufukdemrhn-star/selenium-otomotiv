@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
 </head>
 <body>
 
@@ -167,10 +167,8 @@
 
       <!-- TAB 3: İHALE -->
       <section id="tab-auction" class="tab-content">
-        <div class="construction-state">
-          <div class="construction-icon">🔨</div>
-          <h2 class="construction-title">İhale Hesaplayıcı</h2>
-          <p class="construction-text">Yapım aşamasında</p>
+        <div id="auction-container" class="auction-container">
+          <div class="auction-loading">Yükleniyor...</div>
         </div>
       </section>
 
@@ -408,7 +406,7 @@
     </footer>
   </div>
 
-  <script type="module" src="js/app.js?v=20"></script>
+  <script type="module" src="js/app.js?v=21"></script>
 
   <!-- PWA: Service Worker kaydı (Faz 10) -->
   <script>
