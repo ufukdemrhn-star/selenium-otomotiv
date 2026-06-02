@@ -2,10 +2,11 @@
 // profile.js — Profil sekmesi (Faz 9.A)
 // Hesap bilgisi + Tema seçici + Hakkında
 // ============================================================
-import { emailToUsername } from "./auth.js?v=15";
+import { emailToUsername, logout } from "./auth.js?v=15";
 import { THEMES, setTheme, getCurrentTheme } from "./theme-manager.js?v=17";
 import { auth } from "./firebase.js?v=15";
 import { initBoard, stopBoard } from "./board.js?v=19";
+import { showConfirm, showToast } from "./ui-dialogs.js?v=15";
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
@@ -66,6 +67,18 @@ function render() {
         `).join('')}
       </div>
     </div>
+
+    <!-- Çıkış Yap -->
+    <div class="profile-section profile-logout-section">
+      <button type="button" class="profile-logout-btn" id="profile-logout-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Çıkış Yap</span>
+      </button>
+    </div>
   `;
 
   // Tema seçimi
@@ -83,6 +96,27 @@ function render() {
   // Kara tahta'yı başlat
   const boardContainer = document.getElementById('board-container');
   if (boardContainer) initBoard(boardContainer);
+
+  // Çıkış yap butonu (Faz 10)
+  const logoutBtn = document.getElementById('profile-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      const ok = await showConfirm({
+        title: 'Çıkış',
+        message: 'Çıkış yapmak istediğine emin misin?',
+        confirmText: 'Çıkış Yap',
+        cancelText: 'İptal',
+        danger: true
+      });
+      if (!ok) return;
+      try {
+        await logout();
+        // onAuthChange listener login ekranına döndürecek
+      } catch (err) {
+        console.error('Çıkış hatası:', err);
+      }
+    });
+  }
 }
 
 export function initProfile(container) {
@@ -100,4 +134,4 @@ export function stopProfile() {
   currentContainer = null;
 }
 
-console.log('👤 profile.js v19 yüklendi (Faz 9.C: Bizim Alanımız)');
+console.log('👤 profile.js v20 yüklendi (Faz 10: çıkış butonu)');
