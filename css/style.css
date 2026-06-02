@@ -3933,3 +3933,412 @@ button { font-family: inherit; }
     font-size: 0.75rem;
   }
 }
+
+/* ============================================ */
+/* FAZ 9.C — Bizim Alanımız (Not + Sayaç)         */
+/* ============================================ */
+
+/* Eski Kara Tahta stillerini DEVRE DIŞI bırak */
+.board-card { display: none !important; }
+
+.bizim-alan {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ============== NOT KARTI ============== */
+.ba-note-wrap {
+  position: relative;
+}
+
+.ba-note {
+  background: linear-gradient(155deg, #f5ecd9 0%, #ede0c0 100%);
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem 1.4rem;
+  position: relative;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  color: #2a2418;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+/* Kağıt dokusu efekti */
+.ba-note::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      105deg,
+      transparent,
+      transparent 60px,
+      rgba(0, 0, 0, 0.015) 60px,
+      rgba(0, 0, 0, 0.015) 62px
+    ),
+    radial-gradient(circle at 30% 20%, rgba(255, 200, 100, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.ba-note > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Not - Görüntüleme modu */
+.ba-note-view {
+  cursor: default;
+}
+
+.ba-note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.ba-note-from {
+  font-family: 'Caveat', cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3d3422;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.ba-note-mini-heart {
+  color: #e63946;
+  font-size: 1.4rem;
+  text-shadow: 0 2px 4px rgba(230, 57, 70, 0.3);
+  animation: heart-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes heart-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.ba-note-text {
+  font-family: 'Caveat', cursive;
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #2a2418;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  padding: 0.3rem 0;
+  letter-spacing: 0.01em;
+}
+
+.ba-note-date {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: rgba(60, 50, 35, 0.55);
+  text-align: right;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+.ba-note-edit-btn {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 0.7rem;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a3f2a;
+  transition: all 0.18s;
+  padding: 0;
+  z-index: 2;
+}
+
+.ba-note-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
+}
+
+/* Boş not durumu */
+.ba-note-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 1.5rem 1rem;
+  min-height: 150px;
+  transition: transform 0.15s;
+}
+
+.ba-note-empty:hover {
+  transform: translateY(-2px);
+}
+
+.ba-note-empty-icon {
+  color: rgba(60, 50, 35, 0.4);
+  margin-bottom: 0.6rem;
+}
+
+.ba-note-empty p {
+  font-family: 'Caveat', cursive;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #4a3f2a;
+  margin: 0.2rem 0;
+}
+
+.ba-note-empty .ba-empty-sub {
+  font-size: 1rem;
+  color: rgba(60, 50, 35, 0.6);
+  font-weight: 500;
+}
+
+/* Not - Düzenleme modu */
+.ba-note-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.ba-note-edit-label {
+  font-family: 'Caveat', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #3d3422;
+}
+
+.ba-char-count {
+  font-size: 0.78rem;
+  color: rgba(60, 50, 35, 0.6);
+  font-weight: 600;
+}
+
+.ba-note-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: 'Caveat', cursive;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #2a2418;
+  resize: vertical;
+  min-height: 100px;
+  max-height: 300px;
+  outline: none;
+  padding: 0;
+  box-sizing: border-box;
+  letter-spacing: 0.01em;
+}
+
+.ba-note-textarea::placeholder {
+  color: rgba(60, 50, 35, 0.4);
+  font-style: italic;
+}
+
+.ba-note-edit-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.ba-btn {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ba-btn-secondary {
+  background: rgba(0, 0, 0, 0.08);
+  color: #4a3f2a;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.ba-btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.ba-btn-primary {
+  background: linear-gradient(135deg, #2a2418, #3d3422);
+  color: #f5ecd9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.ba-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.ba-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============== SAYAÇ ============== */
+.ba-counter-wrap {
+  position: relative;
+}
+
+.ba-counter-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.3rem 1.1rem 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.ba-counter-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 30%,
+    var(--accent-bg, rgba(0, 212, 170, 0.06)) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.ba-counter-title {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ba-counter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ba-counter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.3rem;
+}
+
+.ba-counter-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+
+.ba-counter-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+
+.ba-counter-edit-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 26px;
+  height: 26px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  padding: 0;
+  z-index: 2;
+}
+
+.ba-counter-edit-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Boş sayaç durumu */
+.ba-counter-empty {
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-light);
+  border-radius: 16px;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
+}
+
+.ba-counter-empty p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Mobil */
+@media (max-width: 480px) {
+  .ba-counter-grid {
+    gap: 0.3rem;
+  }
+  .ba-counter-num {
+    font-size: 1.15rem;
+  }
+  .ba-counter-label {
+    font-size: 0.55rem;
+  }
+  .ba-counter-item {
+    padding: 0.5rem 0.2rem;
+  }
+  .ba-note {
+    padding: 1.5rem 1.3rem 1.2rem;
+  }
+  .ba-note-text {
+    font-size: 1.4rem;
+  }
+  .ba-note-from {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .ba-counter-num {
+    font-size: 1rem;
+  }
+  .ba-counter-label {
+    font-size: 0.52rem;
+  }
+}
