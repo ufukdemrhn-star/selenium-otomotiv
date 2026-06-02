@@ -8,6 +8,7 @@ import { showConfirm } from "./ui-dialogs.js?v=15";
 import { initHomeStats, stopHomeStats } from "./home-stats.js?v=17";
 import { loadTheme } from "./theme-manager.js?v=17";
 import { initProfile } from "./profile.js?v=20";
+import { initAuctionCalc, stopAuctionCalc } from "./auction-calc.js?v=21";
 
 // Tema'yı en başta yükle (login öncesi de gerekli, splash ekranı için)
 loadTheme();
@@ -25,6 +26,7 @@ function showScreen(name) {
 let vehicleListInitialized = false;
 let homeStatsInitialized = false;
 let profileInitialized = false;
+let auctionCalcInitialized = false;
 
 onAuthChange(user => {
   if (user) {
@@ -46,10 +48,18 @@ onAuthChange(user => {
         profileInitialized = true;
       }
     }
+    if (!auctionCalcInitialized) {
+      const auctionContainer = document.getElementById('auction-container');
+      if (auctionContainer) {
+        initAuctionCalc(auctionContainer);
+        auctionCalcInitialized = true;
+      }
+    }
   } else {
     showScreen('login');
     if (vehicleListInitialized) { stopVehicleList(); vehicleListInitialized = false; }
     if (homeStatsInitialized) { stopHomeStats(); homeStatsInitialized = false; }
+    if (auctionCalcInitialized) { stopAuctionCalc(); auctionCalcInitialized = false; }
     profileInitialized = false;
   }
 });
@@ -146,4 +156,4 @@ subTabs.forEach(btn => {
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v2.0 — Faz 10 PWA yüklendi');
+console.log('🚗 Selenium Otomotiv v2.1 — Faz 11 (İhale Hesaplayıcı) yüklendi');
