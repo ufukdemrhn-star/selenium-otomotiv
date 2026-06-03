@@ -3,7 +3,7 @@
 // Real-time vehicle + vitrin foto hero + foto galerisi + 5-açılı showcase
 // ============================================================
 import { createDamageDiagram } from "./damage-diagram.js?v=15";
-import { createDamageShowcase } from "./damage-showcase.js?v=15";
+import { createDamageShowcase } from "./damage-showcase.js?v=22";
 import { listenVehicle, restoreSoldVehicle, softDeleteVehicle, restoreDeletedVehicle, hardDeleteVehicle } from "./vehicles-db.js?v=15";
 import { createPhotoGallery } from "./photo-gallery.js?v=15";
 import { openWizard } from "./wizard.js?v=15";
