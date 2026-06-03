@@ -1,6 +1,6 @@
 // ============================================================
 // damage-showcase.js v22 — Raster bazlı ekspertiz görseli
-// Background: 1.jpg (lacivert + 5 açı araç)
+// Background: background.jpg (lacivert + 5 açı araç)
 // Overlay: 13 PNG (her parça için, şeffaf zemin)
 // L/B/D durumlarına göre CSS mask + background-color
 // ============================================================
@@ -39,24 +39,16 @@ function escapeHtml(s) {
   );
 }
 
-/**
- * Vehicle damage object'inden ekspertiz görseli HTML'i üretir.
- * @param {Object} damage  Örn: { kaput: 'L', 'on-tampon': 'B', ... }
- * @returns {string} HTML
- */
-export function createDamageShowcase(damage = {}) {
-  // Tüm parçaların durumunu normalleştir
+function buildHTML(damage = {}) {
   const states = {};
   PART_IDS.forEach(id => {
     const v = damage[id];
     states[id] = (v === 'L' || v === 'B' || v === 'D') ? v : null;
   });
 
-  // Hasarlı parça listesi
   const damagedParts = PART_IDS.filter(id => states[id]);
   const damagedCount = damagedParts.length;
 
-  // Counter (kaç L, kaç B, kaç D)
   const countL = damagedParts.filter(id => states[id] === 'L').length;
   const countB = damagedParts.filter(id => states[id] === 'B').length;
   const countD = damagedParts.filter(id => states[id] === 'D').length;
@@ -106,7 +98,31 @@ export function createDamageShowcase(damage = {}) {
   `;
 }
 
-// Geriye dönük uyumluluk için alias
-export const renderDamageShowcase = createDamageShowcase;
+/**
+ * Ekspertiz görselini container'a basar.
+ * @param {Object} options
+ * @param {HTMLElement} options.container - Hedef DOM element
+ * @param {Object} options.damage - { kaput: 'L', 'on-tampon': 'B', ... }
+ * @returns {Object} { update(newDamage), destroy() } API
+ */
+export function createDamageShowcase({ container, damage = {} } = {}) {
+  if (!container) {
+    console.warn('createDamageShowcase: container yok');
+    return null;
+  }
+
+  // Render
+  container.innerHTML = buildHTML(damage);
+
+  // Component API
+  return {
+    update(newDamage) {
+      container.innerHTML = buildHTML(newDamage || {});
+    },
+    destroy() {
+      container.innerHTML = '';
+    }
+  };
+}
 
 console.log('🎨 damage-showcase.js v22 yüklendi (raster bazlı)');
