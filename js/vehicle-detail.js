@@ -2,7 +2,6 @@
 // vehicle-detail.js — Araç detay sayfası (Faz 6.C)
 // Real-time vehicle + vitrin foto hero + foto galerisi + 5-açılı showcase
 // ============================================================
-import { createDamageDiagram } from "./damage-diagram.js?v=15";
 import { createDamageShowcase } from "./damage-showcase.js?v=22";
 import { listenVehicle, restoreSoldVehicle, softDeleteVehicle, restoreDeletedVehicle, hardDeleteVehicle } from "./vehicles-db.js?v=15";
 import { createPhotoGallery } from "./photo-gallery.js?v=15";
@@ -79,7 +78,6 @@ function getStatusLabel(status) {
 
 // State
 let currentVehicle = null;
-let detailDamageComponent = null;
 let photoGalleryComponent = null;
 let vehicleUnsubscribe = null;
 
@@ -128,7 +126,6 @@ function closeDetail() {
   }
 
   currentVehicle = null;
-  detailDamageComponent = null;
 }
 
 function updateHero() {
@@ -284,14 +281,6 @@ function render() {
         <div id="detail-showcase-container"></div>
       </div>
 
-      <!-- HASAR DETAYI (üstten + parça listesi) -->
-      ${hasDamageData ? `
-        <div class="detail-section">
-          <h2 class="detail-section-title">Hasar Detayı</h2>
-          <div id="detail-damage-container"></div>
-        </div>
-      ` : ''}
-
       <!-- MASRAFLAR (Faz 7.B) -->
       <div class="detail-section">
         <div id="detail-expenses-container"></div>
@@ -396,18 +385,6 @@ function render() {
       container: showcaseContainer,
       damage: v.damage || {}
     });
-  }
-
-  // Detaylı hasar şeması (readonly)
-  if (hasDamageData) {
-    const damageContainer = document.getElementById('detail-damage-container');
-    if (damageContainer) {
-      detailDamageComponent = createDamageDiagram({
-        container: damageContainer,
-        initialData: v.damage || {},
-        readonly: true
-      });
-    }
   }
 
   // Foto galerisi
@@ -585,4 +562,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-console.log('📋 vehicle-detail.js v15 yüklendi (Faz 7.D: Sil + Geri Yükle + Kalıcı Sil)');
+console.log('📋 vehicle-detail.js v22 yüklendi (Faz 12: Raster Ekspertiz)');
