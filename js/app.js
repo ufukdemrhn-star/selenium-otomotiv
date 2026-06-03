@@ -156,4 +156,4 @@ subTabs.forEach(btn => {
 const addVehicleBtn = document.getElementById('add-vehicle-btn');
 if (addVehicleBtn) addVehicleBtn.addEventListener('click', openWizard);
 
-console.log('🚗 Selenium Otomotiv v2.1 — Faz 11 (İhale Hesaplayıcı) yüklendi');
+console.log('🚗 Selenium Otomotiv v2.2 — Faz 12 (Raster Ekspertiz) yüklendi');
