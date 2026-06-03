@@ -44,7 +44,7 @@ function escapeHtml(s) {
  * @param {Object} damage  Örn: { kaput: 'L', 'on-tampon': 'B', ... }
  * @returns {string} HTML
  */
-export function renderDamageShowcase(damage = {}) {
+export function createDamageShowcase(damage = {}) {
   // Tüm parçaların durumunu normalleştir
   const states = {};
   PART_IDS.forEach(id => {
@@ -105,5 +105,8 @@ export function renderDamageShowcase(damage = {}) {
     </div>
   `;
 }
+
+// Geriye dönük uyumluluk için alias
+export const renderDamageShowcase = createDamageShowcase;
 
 console.log('🎨 damage-showcase.js v22 yüklendi (raster bazlı)');
