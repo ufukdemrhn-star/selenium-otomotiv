@@ -5,26 +5,44 @@
 // L/B/D durumlarına göre CSS mask + background-color
 // ============================================================
 
+// DB'deki parça ID'leri (underscore_separated)
 const PART_IDS = [
-  'kaput', 'tavan', 'on-tampon', 'arka-tampon', 'bagaj',
-  'sol-on-camurluk', 'sag-on-camurluk', 'sol-arka-camurluk', 'sag-arka-camurluk',
-  'sol-on-kapi', 'sag-on-kapi', 'sol-arka-kapi', 'sag-arka-kapi'
+  'motor_kaputu', 'tavan', 'on_tampon', 'arka_tampon', 'bagaj_kapagi',
+  'sol_on_camurluk', 'sag_on_camurluk', 'sol_arka_camurluk', 'sag_arka_camurluk',
+  'sol_on_kapi', 'sag_on_kapi', 'sol_arka_kapi', 'sag_arka_kapi'
 ];
 
+// DB ID → PNG dosya adı
+const PART_FILES = {
+  'motor_kaputu': 'kaput.png',
+  'tavan': 'tavan.png',
+  'on_tampon': 'on-tampon.png',
+  'arka_tampon': 'arka-tampon.png',
+  'bagaj_kapagi': 'bagaj.png',
+  'sol_on_camurluk': 'sol-on-camurluk.png',
+  'sag_on_camurluk': 'sag-on-camurluk.png',
+  'sol_arka_camurluk': 'sol-arka-camurluk.png',
+  'sag_arka_camurluk': 'sag-arka-camurluk.png',
+  'sol_on_kapi': 'sol-on-kapi.png',
+  'sag_on_kapi': 'sag-on-kapi.png',
+  'sol_arka_kapi': 'sol-arka-kapi.png',
+  'sag_arka_kapi': 'sag-arka-kapi.png'
+};
+
 const PART_LABELS = {
-  'kaput': 'Motor Kaputu',
+  'motor_kaputu': 'Motor Kaputu',
   'tavan': 'Tavan',
-  'on-tampon': 'Ön Tampon',
-  'arka-tampon': 'Arka Tampon',
-  'bagaj': 'Bagaj Kapağı',
-  'sol-on-camurluk': 'Sol Ön Çamurluk',
-  'sag-on-camurluk': 'Sağ Ön Çamurluk',
-  'sol-arka-camurluk': 'Sol Arka Çamurluk',
-  'sag-arka-camurluk': 'Sağ Arka Çamurluk',
-  'sol-on-kapi': 'Sol Ön Kapı',
-  'sag-on-kapi': 'Sağ Ön Kapı',
-  'sol-arka-kapi': 'Sol Arka Kapı',
-  'sag-arka-kapi': 'Sağ Arka Kapı'
+  'on_tampon': 'Ön Tampon',
+  'arka_tampon': 'Arka Tampon',
+  'bagaj_kapagi': 'Bagaj Kapağı',
+  'sol_on_camurluk': 'Sol Ön Çamurluk',
+  'sag_on_camurluk': 'Sağ Ön Çamurluk',
+  'sol_arka_camurluk': 'Sol Arka Çamurluk',
+  'sag_arka_camurluk': 'Sağ Arka Çamurluk',
+  'sol_on_kapi': 'Sol Ön Kapı',
+  'sag_on_kapi': 'Sağ Ön Kapı',
+  'sol_arka_kapi': 'Sol Arka Kapı',
+  'sag_arka_kapi': 'Sağ Arka Kapı'
 };
 
 const STATE_LABELS = {
@@ -37,6 +55,13 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
   );
+}
+
+/**
+ * Absolute URL üretir — CSS context'inden bağımsız çalışır.
+ */
+function imgUrl(filename) {
+  return new URL('images/showcase/' + filename + '?v=22', document.baseURI).href;
 }
 
 function buildHTML(damage = {}) {
@@ -53,19 +78,24 @@ function buildHTML(damage = {}) {
   const countB = damagedParts.filter(id => states[id] === 'B').length;
   const countD = damagedParts.filter(id => states[id] === 'D').length;
 
+  const bgUrl = imgUrl('background.jpg');
+
   return `
     <div class="dmg-raster-wrap">
       <div class="dmg-raster-stage">
-        <img class="dmg-raster-bg" src="images/showcase/background.jpg?v=22" alt="Araç Ekspertiz">
-        ${damagedParts.map(partId => `
-          <div
-            class="dmg-overlay dmg-overlay-${states[partId]}"
-            data-part="${escapeHtml(partId)}"
-            data-state="${escapeHtml(states[partId])}"
-            style="--mask-img: url('images/showcase/${escapeHtml(partId)}.png?v=22')"
-            title="${escapeHtml(PART_LABELS[partId])} — ${escapeHtml(STATE_LABELS[states[partId]])}"
-          ></div>
-        `).join('')}
+        <img class="dmg-raster-bg" src="${bgUrl}" alt="Araç Ekspertiz">
+        ${damagedParts.map(partId => {
+          const fileUrl = imgUrl(PART_FILES[partId]);
+          return `
+            <div
+              class="dmg-overlay dmg-overlay-${states[partId]}"
+              data-part="${escapeHtml(partId)}"
+              data-state="${escapeHtml(states[partId])}"
+              style="--mask-img: url('${fileUrl}')"
+              title="${escapeHtml(PART_LABELS[partId])} — ${escapeHtml(STATE_LABELS[states[partId]])}"
+            ></div>
+          `;
+        }).join('')}
       </div>
 
       ${damagedCount > 0 ? `
@@ -102,7 +132,7 @@ function buildHTML(damage = {}) {
  * Ekspertiz görselini container'a basar.
  * @param {Object} options
  * @param {HTMLElement} options.container - Hedef DOM element
- * @param {Object} options.damage - { kaput: 'L', 'on-tampon': 'B', ... }
+ * @param {Object} options.damage - { motor_kaputu: 'L', on_tampon: 'B', ... }
  * @returns {Object} { update(newDamage), destroy() } API
  */
 export function createDamageShowcase({ container, damage = {} } = {}) {
@@ -111,10 +141,8 @@ export function createDamageShowcase({ container, damage = {} } = {}) {
     return null;
   }
 
-  // Render
   container.innerHTML = buildHTML(damage);
 
-  // Component API
   return {
     update(newDamage) {
       container.innerHTML = buildHTML(newDamage || {});
@@ -125,4 +153,4 @@ export function createDamageShowcase({ container, damage = {} } = {}) {
   };
 }
 
-console.log('🎨 damage-showcase.js v22 yüklendi (raster bazlı)');
+console.log('🎨 damage-showcase.js v22 yüklendi (raster bazlı, DB id mapping)');
